@@ -1,4 +1,4 @@
-package com.s7soft.newsmaker;
+package com.s7soft.gae.newsmaker;
 
 import java.io.IOException;
 
@@ -7,7 +7,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Node;
 import org.jsoup.select.Elements;
 
-import com.s7soft.newsmaker.translation.TranslationUtil;
+import com.s7soft.gae.newsmaker.translation.TranslationUtil;
 
 public class NewsMaker {
 
@@ -56,7 +56,10 @@ public class NewsMaker {
 
 	}
 
-
+	public static void start(){
+		// DBからRssSeedを取得
+		// RssSeedからタイトルと本文を取得、通訳+DBに保存
+	}
 
 	public static String getNewsBody(String newsUrl){
 

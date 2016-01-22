@@ -1,4 +1,4 @@
-package com.s7soft.newsmaker.translation;
+package com.s7soft.gae.newsmaker.translation;
 
 
 import java.io.BufferedReader;
