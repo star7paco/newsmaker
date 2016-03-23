@@ -26,7 +26,7 @@
 
 
 <h3>새로운 유저와 메시지</h3>
-<form action="/category-add">
+<form action="/admin/category-add">
 	name : <input type="text" name="name"><br>
 	url : <input type="text" name="url"><br>
 	rssUrl : <input type="text" name="rssUrl"><br>

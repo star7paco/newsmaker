@@ -32,7 +32,7 @@ public class NewsController {
 		return "index";
 	}
 
-	@RequestMapping("category-list")
+	@RequestMapping("admin/category-list")
 	String categoryList(Model model){
 		List<CategoryClass> categoryList = categoryRepo.findAll();
 		LOGGER.info("test {}", categoryList);
@@ -47,11 +47,11 @@ public class NewsController {
 		return "post-list";
 	}
 
-	@RequestMapping("category-add")
+	@RequestMapping("admin/category-add")
 	String add(CategoryClass member){
 		member.setDate(new Date());
 		categoryRepo.save(member);
-		return "redirect:/category-list";
+		return "redirect:/admin/category-list";
 	}
 
 	@RequestMapping("post-add")
@@ -61,6 +61,6 @@ public class NewsController {
 	}
 
 	String update(){
-		return "redirect:/category-list";
+		return "redirect:/admin/category-list";
 	}
 }

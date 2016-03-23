@@ -2,5 +2,5 @@
 <title>InsertTitleMessage</title>
 
 
-<a href="category-list">category-list</a><br><br>
+<a href="admin/category-list">category-list</a><br><br>
 <a href="post-list">post-list</a><br><br>

@@ -6,9 +6,9 @@
 	<welcome-file-list>
         <welcome-file>index.html</welcome-file>
     </welcome-file-list>
-    
-    
-    
+
+
+
 	<!-- 03. Dispatcher Servlet Config -->
      <servlet>
           <servlet-name>dispatcherServlet</servlet-name>
@@ -17,14 +17,14 @@
                <param-name>contextConfigLocation</param-name>
                <param-value>/META-INF/spring/dispatcherServlet.xml</param-value>
           </init-param>
-          
+
      </servlet>
      <servlet-mapping>
           <servlet-name>dispatcherServlet</servlet-name>
           <url-pattern>/</url-pattern>
      </servlet-mapping>
-     
-   
+
+
      <context-param>
 		<param-name>contextConfigLocation</param-name>
 		<param-value>
@@ -37,5 +37,14 @@
 	        org.springframework.web.context.ContextLoaderListener
 	    </listener-class>
 	</listener>
-    
+
+<filter>
+  <filter-name>adminFilter</filter-name>
+  <filter-class>com.s7soft.gae.news.filter.AdminFilter</filter-class>
+</filter>
+<filter-mapping>
+  <filter-name>adminFilter</filter-name>
+  <url-pattern>admin/*</url-pattern>
+</filter-mapping>
+
 </web-app>
