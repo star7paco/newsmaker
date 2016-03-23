@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <appengine-web-app xmlns="http://appengine.google.com/ns/1.0">
-  <application>s7soft-1163</application>
-  <version>1</version>
-  <threadsafe>true</threadsafe>
+    <!-- 이부분을 프로젝트 아이디로 설정해주면 된다.  -->
+    <application>${app.id}</application>
+    <!-- 여기가 버젼이 다른 부분이다. 이곳을 다른 버젼으로 만들어주면 다른 버젼으로 올라간다.  -->
+    <version>${app.version}</version>
+    <threadsafe>true</threadsafe>
+
+    <system-properties>
+        <property name="java.util.logging.config.file" value="WEB-INF/logging.properties"/>
+    </system-properties>
 </appengine-web-app>
