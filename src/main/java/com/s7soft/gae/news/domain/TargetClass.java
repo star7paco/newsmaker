@@ -15,6 +15,7 @@ public class TargetClass {
 	private Long id;
 
 	private Long categoryId;
+
 	private String url;
 	private String title;
 	private int status;
@@ -62,9 +63,5 @@ public class TargetClass {
 	public void setUrl(String url) {
 		this.url = url;
 	}
-
-
-
-
 
 }
