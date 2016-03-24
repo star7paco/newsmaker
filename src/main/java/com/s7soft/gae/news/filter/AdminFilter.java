@@ -24,16 +24,12 @@ public class AdminFilter implements Filter {
 	@Override
 	public void doFilter(ServletRequest req, ServletResponse res,
 			FilterChain chain) throws IOException, ServletException {
-		System.out.println("start");
 		if (AdminUtil.isAdminUser()) {
-			System.out.println("is Admin Ok");
 		}else{
-			System.out.println("is Admin NG");
 			((HttpServletResponse)res).sendRedirect("/");
 			return;
 		}
 		chain.doFilter(req, res);
-		System.out.println("end");
 	}
 
 	@Override

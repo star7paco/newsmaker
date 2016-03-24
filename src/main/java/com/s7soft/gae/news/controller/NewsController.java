@@ -12,8 +12,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.s7soft.gae.news.domain.CategoryClass;
 import com.s7soft.gae.news.domain.PostClass;
+import com.s7soft.gae.news.domain.TargetClass;
 import com.s7soft.gae.news.repository.CategoryRespository;
 import com.s7soft.gae.news.repository.PostRespository;
+import com.s7soft.gae.news.repository.TargetRespository;
+import com.s7soft.gae.news.rss.RssReader;
 
 @Controller
 public class NewsController {
@@ -26,9 +29,33 @@ public class NewsController {
 	@Autowired
 	PostRespository postRepo;
 
+	@Autowired
+	TargetRespository targetRepo;
+
 	@RequestMapping("/spring")
 	String index(){
 		LOGGER.info("log test");
+		return "index";
+	}
+
+	@RequestMapping("rss-read")
+	String rssRead(){
+		LOGGER.info("STAR RssRead");
+		List<CategoryClass> categoryList = categoryRepo.findAll();
+		for(CategoryClass category :categoryList){
+			List<TargetClass> targetList = RssReader.readRss(category);
+			for(TargetClass target : targetList){
+				TargetClass ret = targetRepo.findByUrl(target.getUrl());
+				if(ret != null){
+					LOGGER.info("continue " + ret.getTitle());
+					continue;
+				}
+				target.setCategoryId(category.getId());
+				target.setStatus(1);
+				targetRepo.save(target);
+			}
+		}
+		LOGGER.info("END RssRead");
 		return "index";
 	}
 
@@ -49,10 +76,17 @@ public class NewsController {
 		return "post-list";
 	}
 
+	@RequestMapping("admin/target-list")
+	String targetList(Model model){
+		List<TargetClass> targetList = targetRepo.findAll();
+		model.addAttribute("targetlist", targetList);
+		return "target-list";
+	}
+
 	@RequestMapping("admin/category-add")
-	String add(CategoryClass member){
-		member.setDate(new Date());
-		categoryRepo.save(member);
+	String add(CategoryClass category){
+		category.setDate(new Date());
+		categoryRepo.save(category);
 		return "redirect:/admin/category-list";
 	}
 
