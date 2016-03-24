@@ -47,4 +47,15 @@
   <url-pattern>admin/*</url-pattern>
 </filter-mapping>
 
+<jsp-config>
+<jsp-property-group>
+<url-pattern>*.jsp</url-pattern>
+<el-ignored>false</el-ignored>
+<page-encoding>UTF-8</page-encoding>
+<scripting-invalid>false</scripting-invalid>
+<include-prelude>/WEB-INF/jsp/header.jsp</include-prelude>
+<include-coda>/WEB-INF/jsp/fotter.jsp</include-coda>
+</jsp-property-group>
+</jsp-config>
+
 </web-app>

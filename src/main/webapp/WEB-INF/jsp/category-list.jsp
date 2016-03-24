@@ -1,7 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <title>category-InsertTitleMessage</title>
-<h3>category 리스트</h3>
+<h3>category 리스트[${categorycount}]</h3>
 <table>
 <tr>
   <th>id</th>
@@ -34,3 +34,6 @@
 	status : <input type="text" name="status"><br>
 	<input type="submit">
 </form>
+
+
+<a href="/">戻る</a>

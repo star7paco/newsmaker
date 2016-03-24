@@ -34,9 +34,11 @@ public class NewsController {
 
 	@RequestMapping("admin/category-list")
 	String categoryList(Model model){
+		long categoryCount = categoryRepo.count();
 		List<CategoryClass> categoryList = categoryRepo.findAll();
 		LOGGER.info("test {}", categoryList);
 		model.addAttribute("categorylist", categoryList);
+		model.addAttribute("categorycount", categoryCount);
 		return "category-list";
 	}
 
@@ -64,3 +66,4 @@ public class NewsController {
 		return "redirect:/admin/category-list";
 	}
 }
+

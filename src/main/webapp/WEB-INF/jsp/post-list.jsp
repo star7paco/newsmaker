@@ -11,3 +11,5 @@
  tatle : <input type="text" name="title"><br>
  body : <input type="text" name="body"><br> <input type="submit">
 </form>
+
+<a href="/">戻る</a>
