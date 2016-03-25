@@ -1,20 +1,15 @@
 package com.s7soft.gae.news.domain;
 
-import java.util.Date;
-
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
 import org.springframework.stereotype.Component;
 
-import com.google.appengine.api.datastore.Text;
-
 @Entity
 @Component
-public class TargetClass{
+public class TargetClass {
 
-	// TODO ステータスの定義作成。
 	@Id
 	@GeneratedValue
 	private Long id;
@@ -23,27 +18,7 @@ public class TargetClass{
 
 	private String url;
 	private String title;
-	private Text body;
-
-	private Date date;
 	private int status;
-
-	public Date getDate() {
-		return date;
-	}
-
-	public void setDate(Date date) {
-		this.date = date;
-	}
-
-	public int getStatus() {
-		return status;
-	}
-
-	public void setStatus(int status) {
-		this.status = status;
-	}
-
 
 	public TargetClass() {
 
@@ -73,6 +48,14 @@ public class TargetClass{
 		this.categoryId = categoryId;
 	}
 
+	public int getStatus() {
+		return status;
+	}
+
+	public void setStatus(int status) {
+		this.status = status;
+	}
+
 	public String getUrl() {
 		return url;
 	}
@@ -80,14 +63,5 @@ public class TargetClass{
 	public void setUrl(String url) {
 		this.url = url;
 	}
-
-	public Text getBody() {
-		return body;
-	}
-
-	public void setBody(Text body) {
-		this.body = body;
-	}
-
 
 }

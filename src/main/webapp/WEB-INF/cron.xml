@@ -7,11 +7,4 @@
     <timezone>Asia/Tokyo</timezone>
   </cron>
 
-  <cron>
-    <url>/post-maker</url>
-    <description>cron job Rss Read</description>
-    <schedule>every 5 minutes</schedule>
-    <timezone>Asia/Tokyo</timezone>
-  </cron>
-
 </cronentries>
