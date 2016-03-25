@@ -12,6 +12,16 @@ import org.springframework.stereotype.Component;
 @Component
 public class CategoryClass {
 
+	public static CategoryClass getDefault(){
+		CategoryClass category = new CategoryClass();
+		category.setName("Yahoo top");
+		category.setRssUrl("http://news.yahoo.co.jp/pickup/rss.xml");
+		category.setUrl("http://www.yahoo.co.jp/");
+		category.setStatus(1);
+		category.setDate(new Date());
+		return category;
+	}
+
 	@Id
 	@GeneratedValue
 	private Long id;
@@ -19,9 +29,34 @@ public class CategoryClass {
 	private String name;
 	private String url;
 	private String rssUrl;
-	private String tag;
+
+	private Date date;
 	private int status;
-	private Date date ;
+	private int clickCount;
+
+	public Date getDate() {
+		return date;
+	}
+
+	public void setDate(Date date) {
+		this.date = date;
+	}
+
+	public int getStatus() {
+		return status;
+	}
+
+	public void setStatus(int status) {
+		this.status = status;
+	}
+
+	public int getClickCount() {
+		return clickCount;
+	}
+
+	public void setClickCount(int clickCount) {
+		this.clickCount = clickCount;
+	}
 
 	public CategoryClass() {
 
@@ -58,32 +93,5 @@ public class CategoryClass {
 	public void setRssUrl(String rssUrl) {
 		this.rssUrl = rssUrl;
 	}
-
-	public int getStatus() {
-		return status;
-	}
-
-	public void setStatus(int status) {
-		this.status = status;
-	}
-
-	public Date getDate() {
-		return date;
-	}
-
-	public void setDate(Date date) {
-		this.date = date;
-	}
-
-	public String getTag() {
-		return tag;
-	}
-
-	public void setTag(String tag) {
-		this.tag = tag;
-	}
-
-
-
 
 }
