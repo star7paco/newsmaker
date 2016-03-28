@@ -8,6 +8,8 @@ import javax.persistence.Id;
 
 import org.springframework.stereotype.Component;
 
+import com.google.appengine.api.datastore.Text;
+
 @Entity
 @Component
 public class PostClass {
@@ -19,10 +21,10 @@ public class PostClass {
 	private Long targetId;
 	private String url;
 	private String title;
-	private String body;
+	private Text body;
 
 	private String originalTitle;
-	private String originalBody;
+	private Text originalBody;
 
 	private Date date;
 	private int status;
@@ -74,12 +76,20 @@ public class PostClass {
 		this.title = title;
 	}
 
-	public String getBody() {
+	public Text getBody() {
 		return body;
 	}
 
-	public void setBody(String body) {
+	public void setBody(Text body) {
 		this.body = body;
+	}
+
+	public String getStringBody() {
+		if(body!=null){
+			return body.getValue();
+		}else{
+			return null;
+		}
 	}
 
 	public String getUrl() {
@@ -106,11 +116,21 @@ public class PostClass {
 		this.originalTitle = originalTitle;
 	}
 
-	public String getOriginalBody() {
+	public Text getOriginalBody() {
 		return originalBody;
 	}
 
-	public void setOriginalBody(String originalBody) {
+
+	public String getStringBodyOriginalBody() {
+		if(originalBody!=null){
+			return originalBody.getValue();
+		}else{
+			return null;
+		}
+	}
+
+
+	public void setOriginalBody(Text originalBody) {
 		this.originalBody = originalBody;
 	}
 

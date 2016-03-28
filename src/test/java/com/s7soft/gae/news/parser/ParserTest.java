@@ -1,12 +1,16 @@
 package com.s7soft.gae.news.parser;
 
-import java.io.IOException;
+import static org.assertj.core.api.Assertions.*;
 
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.junit.Test;
+
+import com.s7soft.gae.news.domain.CategoryClass;
+import com.s7soft.gae.news.domain.ParserClass;
+import com.s7soft.gae.news.domain.TargetClass;
+import com.s7soft.gae.news.rss.RssReader;
 
 public class ParserTest {
 
@@ -14,41 +18,78 @@ public class ParserTest {
 
 	@Test
 	public void parsering() {
-		Document doc = null;
-		try {
-			doc = Jsoup.connect(getNewsLink("http://news.yahoo.co.jp/pickup/6195601")).get();
-//			System.out.println(doc);
 
-			Elements element1 = doc.getElementsByClass("article");
-			System.out.println(element1.text());
+		TargetClass target = new TargetClass();
+		target.setUrl("http://news.yahoo.co.jp/pickup/6195601");
 
-			Element element2 = doc.getElementById("ynDetailText");
-			System.out.println(element2.text());
-
-		} catch (IOException e) {
-		} catch (Exception e) {
-			Elements element1 = doc.getElementsByClass("yjXL");
-			System.out.println(element1.text());
-
-			Elements element2 = doc.getElementsByClass("ymuiContainerNopad");
-			System.out.println(element2.text());
-		}
-	}
-
-
-	public String getNewsLink(String rssUrl) {
-		try {
-			Document page = Jsoup.connect(rssUrl).get();
-
-			Elements elements = page.getElementsByClass("newslink");
-			String newslink = elements.get(0).attr("href");
-			if(newslink == null || newslink.trim().length() < 1){
-				return rssUrl;
+		for(ParserClass parser: ParserClass.getDefault()){
+			if(!target.getUrl().contains(parser.getKey())){
+				continue;
 			}
-			return newslink;
-		} catch (IOException e) {
-			e.printStackTrace();
+			TargetClass ret = Parser.parsing(target, parser);
+			assertThat(ret.getUrl()).startsWith("http://h");
+			System.out.println(ret.getUrl());
 		}
-		return rssUrl;
+
+
+		target.setUrl("http://headlines.yahoo.co.jp/videonews/nnn?a=20160325-00000006-nnn-soci");
+
+		for(ParserClass parser: ParserClass.getDefault()){
+			if(!target.getUrl().contains(parser.getKey())){
+				continue;
+			}
+			TargetClass ret = Parser.parsing(target, parser);
+
+			System.out.println(ret.getTitle());
+			System.out.println(ret.getStringBody());
+		}
+
+
+		target.setUrl("http://headlines.yahoo.co.jp/hl?a=20160325-00000067-dal-base");
+
+		for(ParserClass parser: ParserClass.getDefault()){
+			if(!target.getUrl().contains(parser.getKey())){
+				continue;
+			}
+			TargetClass ret = Parser.parsing(target, parser);
+
+			System.out.println(ret.getTitle());
+			System.out.println(ret.getStringBody());
+		}
+
 	}
+
+	@Test
+	public void rssAndParsing(){
+
+		List<TargetClass> retList = new ArrayList<TargetClass>();
+
+		CategoryClass category = new CategoryClass();
+		category.setRssUrl("http://news.yahoo.co.jp/pickup/rss.xml");
+		List<TargetClass> list = RssReader.readRss(category );
+		for (TargetClass target : list) {
+			for(ParserClass parser: ParserClass.getDefault()){
+				if(!target.getUrl().contains(parser.getKey())){
+					continue;
+				}
+				TargetClass ret = Parser.parsing(target, parser);
+				System.out.println(ret.getUrl());
+				retList.add(ret);
+			}
+		}
+
+		System.out.println("----------------------------------------------------------------");
+
+		for (TargetClass target : retList) {
+			for(ParserClass parser: ParserClass.getDefault()){
+				if(!target.getUrl().contains(parser.getKey())){
+					continue;
+				}
+				TargetClass ret = Parser.parsing(target, parser);
+				System.out.println(ret.getTitle());
+				System.out.println(ret.getStringBody());
+			}
+		}
+	}
+
 }

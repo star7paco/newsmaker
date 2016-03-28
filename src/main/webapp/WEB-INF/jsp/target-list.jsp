@@ -3,7 +3,7 @@
 <title>POST-InsertTitleMessage</title>
 <h3>유저 리스트</h3>
 <c:forEach var="target" items="${targetlist}">
- url : ${target.url} ,  title : ${target.title} , status : ${target.status} ,  body : ${target.body} <br>
+ url : ${target.url} ,  title : ${target.title} , status : ${target.status} ,  body : ${target.stringBody} <br>
 </c:forEach>
 
 <a href="/">戻る</a>

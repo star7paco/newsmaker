@@ -8,6 +8,8 @@ import javax.persistence.Id;
 
 import org.springframework.stereotype.Component;
 
+import com.google.appengine.api.datastore.Text;
+
 @Entity
 @Component
 public class TargetClass{
@@ -21,7 +23,7 @@ public class TargetClass{
 
 	private String url;
 	private String title;
-	private String body;
+	private Text body;
 
 	private Date date;
 	private int status;
@@ -79,11 +81,19 @@ public class TargetClass{
 		this.url = url;
 	}
 
-	public String getBody() {
+	public Text getBody() {
 		return body;
 	}
 
-	public void setBody(String body) {
+	public String getStringBody() {
+		if(body!=null){
+			return body.getValue();
+		}else{
+			return null;
+		}
+	}
+
+	public void setBody(Text body) {
 		this.body = body;
 	}
 

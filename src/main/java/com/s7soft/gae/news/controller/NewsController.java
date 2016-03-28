@@ -220,7 +220,15 @@ public class NewsController {
 
 			// 一致するparserが無い
 			if(parser == null){
-				targetRepo.delete(target.getId());
+				TargetClass newTarget = new TargetClass();
+				newTarget.setId(target.getId());
+				newTarget.setCategoryId(target.getCategoryId());
+				newTarget.setTitle(target.getTitle());
+				newTarget.setBody(target.getBody());
+				newTarget.setUrl(target.getUrl());
+				newTarget.setStatus(0);
+				newTarget.setDate(new Date());
+				targetRepo.save(newTarget);
 				continue;
 			}
 			System.out.println("parser : " +parser.getKey());
