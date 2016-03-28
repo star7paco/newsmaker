@@ -1,15 +1,21 @@
+<%@page import="com.s7soft.gae.news.adsense.AdSense"%>
 <%@ page contentType="text/html; charset=UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-<title>POST-InsertTitleMessage</title>
-<h3>유저 리스트</h3>
-<c:forEach var="post" items="${postlist}">
- post-name : ${post.title} ,  post-message : ${post.body} <br>
+<title>news</title>
+<%= AdSense.MbAdtop %>
+<h3>news</h3>
+<c:forEach var="post" items="${postList}">
+<a href="post/${post.id}">${post.title}</a> <br>
 </c:forEach>
 
-<h3>새로운 유저와 메시지</h3>
-<form action="/post-add">
- tatle : <input type="text" name="title"><br>
- body : <input type="text" name="body"><br> <input type="submit">
-</form>
+<ul class="pager">
+    <li class="previous">
+        <a href="/post-list/${page-1}">&larr; Newer Posts</a>
+    </li>
+    <li class="next">
+        <a href="/post-list/${page+1}">Older Posts &rarr;</a>
+    </li>
+</ul>
 
+<%= AdSense.MbAdfin %>
 <a href="/">戻る</a>

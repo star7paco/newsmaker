@@ -10,10 +10,15 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import com.google.appengine.api.datastore.Text;
+import com.s7soft.gae.news.domain.PostClass;
+import com.s7soft.gae.news.domain.TargetClass;
 
 
 public class TranslationUtil {
@@ -79,6 +84,25 @@ public class TranslationUtil {
 		return content;
 	}
 
+
+	public static PostClass trans(TargetClass target) throws Exception{
+		PostClass post = new PostClass();
+
+		post.setTargetId(target.getId());
+		post.setOriginalTitle(target.getTitle());
+		post.setOriginalBody(target.getBody());
+		post.setClickCount(0);
+		post.setStatus(1);
+		post.setUrl(target.getUrl());
+
+
+		post.setTitle( getChangeHtml(post.getOriginalTitle()) );
+		post.setBody( new Text(getChangeHtml(post.getStringOriginalBody())) );
+
+		post.setDate(new Date());
+
+		return post;
+	}
 
 
 	/**

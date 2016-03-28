@@ -32,34 +32,34 @@ public class ParserTest {
 		}
 
 
-		target.setUrl("http://headlines.yahoo.co.jp/videonews/nnn?a=20160325-00000006-nnn-soci");
-
-		for(ParserClass parser: ParserClass.getDefault()){
-			if(!target.getUrl().contains(parser.getKey())){
-				continue;
-			}
-			TargetClass ret = Parser.parsing(target, parser);
-
-			System.out.println(ret.getTitle());
-			System.out.println(ret.getStringBody());
-		}
-
-
-		target.setUrl("http://headlines.yahoo.co.jp/hl?a=20160325-00000067-dal-base");
-
-		for(ParserClass parser: ParserClass.getDefault()){
-			if(!target.getUrl().contains(parser.getKey())){
-				continue;
-			}
-			TargetClass ret = Parser.parsing(target, parser);
-
-			System.out.println(ret.getTitle());
-			System.out.println(ret.getStringBody());
-		}
+//		target.setUrl("http://headlines.yahoo.co.jp/videonews/nnn?a=20160325-00000006-nnn-soci");
+//
+//		for(ParserClass parser: ParserClass.getDefault()){
+//			if(!target.getUrl().contains(parser.getKey())){
+//				continue;
+//			}
+//			TargetClass ret = Parser.parsing(target, parser);
+//
+//			System.out.println(ret.getTitle());
+//			System.out.println(ret.getStringBody());
+//		}
+//
+//
+//		target.setUrl("http://headlines.yahoo.co.jp/hl?a=20160325-00000067-dal-base");
+//
+//		for(ParserClass parser: ParserClass.getDefault()){
+//			if(!target.getUrl().contains(parser.getKey())){
+//				continue;
+//			}
+//			TargetClass ret = Parser.parsing(target, parser);
+//
+//			System.out.println(ret.getTitle());
+//			System.out.println(ret.getStringBody());
+//		}
 
 	}
 
-	@Test
+//	@Test
 	public void rssAndParsing(){
 
 		List<TargetClass> retList = new ArrayList<TargetClass>();

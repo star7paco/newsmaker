@@ -21,6 +21,7 @@ import com.s7soft.gae.news.repository.ParserRespository;
 import com.s7soft.gae.news.repository.PostRespository;
 import com.s7soft.gae.news.repository.TargetRespository;
 import com.s7soft.gae.news.rss.RssReader;
+import com.s7soft.gae.news.translation.TranslationUtil;
 
 @Controller
 public class NewsController {
@@ -40,7 +41,7 @@ public class NewsController {
 	@Autowired
 	TargetRespository targetRepo;
 
-	@RequestMapping("/spring")
+	@RequestMapping("/")
 	String index() {
 		LOGGER.info("log test");
 		return "index";
@@ -132,10 +133,22 @@ public class NewsController {
 	}
 
 	@RequestMapping("post-list")
-	String postList(Model model) {
+	String postList( Model model) {
+		return postList(0,model);
+	}
+	@RequestMapping("post-list/{Id}")
+	String postList(@PathVariable("Id") Integer page, Model model) {
 		List<PostClass> postList = postRepo.findAll();
-		model.addAttribute("postlist", postList);
+		model.addAttribute("postList", postList);
+		model.addAttribute("page", page);
 		return "post-list";
+	}
+
+	@RequestMapping("post/{Id}")
+	String post(@PathVariable("Id") Long postId, Model model) {
+		PostClass post = postRepo.findOne(postId);
+		model.addAttribute("post", post);
+		return "post";
 	}
 
 	@RequestMapping("post-add")
@@ -144,10 +157,18 @@ public class NewsController {
 		return "redirect:/post-list";
 	}
 
+	/**  target */
 	@RequestMapping("admin/target-list")
 	String targetList(Model model) {
+		return targetList(0, model);
+	}
+
+	/**  target */
+	@RequestMapping("admin/target-list/{Id}")
+	String targetList(@PathVariable("Id") Integer page, Model model) {
 		List<TargetClass> targetList = targetRepo.findAll();
-		model.addAttribute("targetlist", targetList);
+		model.addAttribute("targetList", targetList);
+		model.addAttribute("page", page);
 		return "target-list";
 	}
 
@@ -259,6 +280,50 @@ public class NewsController {
 
 		}
 		LOGGER.info("END postMaker");
+		return "index";
+	}
+
+
+	/** cron job */
+	@RequestMapping("trans")
+	String trans() {
+		LOGGER.info("STAR trans");
+
+		int count = 0;
+		List<TargetClass> targetList = targetRepo.findByStatus(2);
+
+		for (TargetClass target : targetList) {
+			System.out.println("targetList size : " +targetList.size());
+
+
+			try {
+				PostClass post = TranslationUtil.trans(target);
+				postRepo.save(post);
+			} catch (Exception e) {
+				e.printStackTrace();
+				continue;
+			}
+
+
+			// 一致するparserが無い
+			TargetClass newTarget = new TargetClass();
+			newTarget.setId(target.getId());
+			newTarget.setCategoryId(target.getCategoryId());
+			newTarget.setTitle(target.getTitle());
+			newTarget.setBody(target.getBody());
+			newTarget.setUrl(target.getUrl());
+			newTarget.setStatus(3);
+			newTarget.setDate(new Date());
+			targetRepo.save(newTarget);
+			count++;
+
+
+			if(count > 5){
+				break;
+			}
+		}
+
+		LOGGER.info("END trans");
 		return "index";
 	}
 }

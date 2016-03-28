@@ -121,7 +121,7 @@ public class PostClass {
 	}
 
 
-	public String getStringBodyOriginalBody() {
+	public String getStringOriginalBody() {
 		if(originalBody!=null){
 			return originalBody.getValue();
 		}else{
