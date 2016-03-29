@@ -9,6 +9,7 @@ import javax.persistence.Id;
 import org.springframework.stereotype.Component;
 
 import com.google.appengine.api.datastore.Text;
+import com.s7soft.gae.news.util.TimeUtil;
 
 @Entity
 @Component
@@ -18,7 +19,7 @@ public class PostClass {
 	@GeneratedValue
 	private Long id;
 
-	private Long targetId;
+	private Long categoryId;
 	private String url;
 	private String title;
 	private Text body;
@@ -31,6 +32,9 @@ public class PostClass {
 	private int clickCount;
 
 
+	public String getDateTime() {
+		return TimeUtil.format(date);
+	}
 
 	public Date getDate() {
 		return date;
@@ -100,14 +104,6 @@ public class PostClass {
 		this.url = url;
 	}
 
-	public Long getTargetId() {
-		return targetId;
-	}
-
-	public void setTargetId(Long targetId) {
-		this.targetId = targetId;
-	}
-
 	public String getOriginalTitle() {
 		return originalTitle;
 	}
@@ -132,6 +128,14 @@ public class PostClass {
 
 	public void setOriginalBody(Text originalBody) {
 		this.originalBody = originalBody;
+	}
+
+	public Long getCategoryId() {
+		return categoryId;
+	}
+
+	public void setCategoryId(Long categoryId) {
+		this.categoryId = categoryId;
 	}
 
 

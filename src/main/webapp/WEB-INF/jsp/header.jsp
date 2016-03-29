@@ -3,10 +3,14 @@
 <%@ page import="com.google.appengine.api.users.User"%>
 <%@ page import="com.google.appengine.api.users.UserServiceFactory" %>
 <%@ page import="com.google.appengine.api.users.UserService" %>
+<style type="text/css">
+p {color:blue; line-height:1.5;}
+h1 {font-size: 14pt;font-weight: normal;}
+</style>
 <%
 if (UserServiceFactory.getUserService().getCurrentUser() != null) { %>
 ようこそ! あなたは <b><%=UserServiceFactory.getUserService().getCurrentUser() .getNickname()%></b>
-という名前でログインしています。<a href='<%=UserServiceFactory.getUserService().createLogoutURL("/")%>'>サインアウト</a><br>
+という名前でログインしています。<a href='<%=UserServiceFactory.getUserService().createLogoutURL("/")%>'>サインアウト</a>
 <%
 	if( AdminUtil.isAdminUser() ){
 		%><a href='/admin'>admin</a><%
@@ -26,3 +30,18 @@ if (UserServiceFactory.getUserService().getCurrentUser() != null) { %>
 
 </script>
 <br>
+<!-- google Site in Search -->
+<script>
+  (function() {
+    var cx = '009245048745248643837:8xh5ivi5mhi';
+    var gcse = document.createElement('script');
+    gcse.type = 'text/javascript';
+    gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//cse.google.com/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0];
+    s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+<gcse:search></gcse:search>
+
