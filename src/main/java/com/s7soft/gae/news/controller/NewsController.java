@@ -6,10 +6,15 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.s7soft.gae.news.domain.CategoryClass;
 import com.s7soft.gae.news.domain.ParserClass;
@@ -42,15 +47,17 @@ public class NewsController {
 	TargetRespository targetRepo;
 
 	@RequestMapping("/")
-	String index() {
-		LOGGER.info("log test");
-		return "index";
+	String index(Model model) {
+		return postList(0, model);
 	}
 
 	@RequestMapping("/admin")
-	String admin() {
+	String admin(Model model) {
 
 		long categoryCount = categoryRepo.count();
+//		long parserCount = parserRepo.count();
+//		long postCount = postRepo.count();
+//		long targetCount = targetRepo.count();
 		if(categoryCount < 1){
 			System.out.println("***************  Setup Default  ***************");
 			categoryRepo.save(CategoryClass.getDefault());
@@ -59,6 +66,10 @@ public class NewsController {
 			}
 		}
 
+		model.addAttribute("categoryCount", categoryCount);
+//		model.addAttribute("parserCount", parserCount);
+//		model.addAttribute("postCount", postCount);
+//		model.addAttribute("targetCount", targetCount);
 
 
 		return "admin";
@@ -133,20 +144,38 @@ public class NewsController {
 	}
 
 	@RequestMapping("post-list")
-	String postList( Model model) {
-		return postList(0,model);
+	String postList( Model model ) {
+		return postList(0, model);
 	}
-	@RequestMapping("post-list/{Id}")
-	String postList(@PathVariable("Id") Integer page, Model model) {
-		List<PostClass> postList = postRepo.findAll();
+
+	@RequestMapping("post-list/{page}")
+	String postList(@PathVariable("page") Integer page, Model model) {
+
+		if(page  < 0){
+			page = 0;
+		}
+
+		Pageable pageable = new PageRequest(page, 10 , Direction.DESC , "date");
+		Page<PostClass> postList = postRepo.findByStatus(1, pageable);
 		model.addAttribute("postList", postList);
 		model.addAttribute("page", page);
 		return "post-list";
 	}
 
 	@RequestMapping("post/{Id}")
-	String post(@PathVariable("Id") Long postId, Model model) {
+	String post(@PathVariable("Id") Long postId, Model model , @RequestParam(required = false) String page) {
+		int intPage = 0;
+		try {
+			intPage = Integer.parseInt(page);
+		} catch (Exception e) {
+		}
+
 		PostClass post = postRepo.findOne(postId);
+		if(post != null){
+			post.setClickCount(post.getClickCount()+1);
+			postRepo.save(post);
+		}
+		model.addAttribute("page", intPage);
 		model.addAttribute("post", post);
 		return "post";
 	}
@@ -295,13 +324,16 @@ public class NewsController {
 		for (TargetClass target : targetList) {
 			System.out.println("targetList size : " +targetList.size());
 
-
-			try {
-				PostClass post = TranslationUtil.trans(target);
-				postRepo.save(post);
-			} catch (Exception e) {
-				e.printStackTrace();
-				continue;
+			// 重複除去
+			List<PostClass> list =postRepo.findByUrl(target.getUrl());
+			if(list.size() < 1){
+				try {
+					PostClass post = TranslationUtil.trans(target);
+					postRepo.save(post);
+				} catch (Exception e) {
+					e.printStackTrace();
+					continue;
+				}
 			}
 
 

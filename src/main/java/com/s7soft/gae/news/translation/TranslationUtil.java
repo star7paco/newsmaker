@@ -88,7 +88,7 @@ public class TranslationUtil {
 	public static PostClass trans(TargetClass target) throws Exception{
 		PostClass post = new PostClass();
 
-		post.setTargetId(target.getId());
+		post.setCategoryId(target.getCategoryId());
 		post.setOriginalTitle(target.getTitle());
 		post.setOriginalBody(target.getBody());
 		post.setClickCount(0);

@@ -7,6 +7,6 @@
  <div class="title">${post.title}</div>
  <div class="body">${post.stringBody} </div>
 <br>
-<a href="/post-list">back</a>
+<a href="/post-list/${page}">back</a>
 <%= AdSense.MbAdfin %>
 
