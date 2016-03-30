@@ -3,14 +3,14 @@
   <cron>
     <url>/rss-read</url>
     <description>cron job Rss Read</description>
-    <schedule>every 20 minutes</schedule>
+    <schedule>every 10 minutes</schedule>
     <timezone>Asia/Tokyo</timezone>
   </cron>
 
   <cron>
     <url>/post-maker</url>
     <description>cron job Rss Read</description>
-    <schedule>every 5 minutes</schedule>
+    <schedule>every 3 minutes</schedule>
     <timezone>Asia/Tokyo</timezone>
   </cron>
 

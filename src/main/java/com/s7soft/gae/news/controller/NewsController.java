@@ -172,6 +172,18 @@ public class NewsController {
 
 		PostClass post = postRepo.findOne(postId);
 		if(post != null){
+
+			// titleの空白をなくす。
+			if(post.getTitle().trim().length() == 0 ){
+				try {
+					String title = TranslationUtil.getChangeHtml(post.getOriginalTitle());
+					post.setTitle(title);
+				} catch (Exception e) {
+					// TODO 自動生成された catch ブロック
+					e.printStackTrace();
+				}
+			}
+
 			post.setClickCount(post.getClickCount()+1);
 			postRepo.save(post);
 		}
@@ -270,25 +282,17 @@ public class NewsController {
 
 			// 一致するparserが無い
 			if(parser == null){
-				TargetClass newTarget = new TargetClass();
-				newTarget.setId(target.getId());
-				newTarget.setCategoryId(target.getCategoryId());
-				newTarget.setTitle(target.getTitle());
-				newTarget.setBody(target.getBody());
-				newTarget.setUrl(target.getUrl());
-				newTarget.setStatus(0);
-				newTarget.setDate(new Date());
-				targetRepo.save(newTarget);
+				target.setStatus(0);
+				targetRepo.save(target);
 				continue;
 			}
 			System.out.println("parser : " +parser.getKey());
 			System.out.println("target : " +target.getUrl());
 
 			count++;
-			TargetClass ret = Parser.parsing(target, parser);
-
-			System.out.println("ret Target: " +ret.getUrl());
-			targetRepo.save(ret);
+			TargetClass saveObj = Parser.parsing(target, parser);
+			System.out.println("ret Target: " +saveObj.getUrl());
+			targetRepo.save(saveObj);
 
 			// TODO 後処理。。。悩み中
 //			switch (parser.getClosing()) {
@@ -329,6 +333,7 @@ public class NewsController {
 			if(list.size() < 1){
 				try {
 					PostClass post = TranslationUtil.trans(target);
+
 					postRepo.save(post);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -338,15 +343,17 @@ public class NewsController {
 
 
 			// 一致するparserが無い
-			TargetClass newTarget = new TargetClass();
-			newTarget.setId(target.getId());
-			newTarget.setCategoryId(target.getCategoryId());
-			newTarget.setTitle(target.getTitle());
-			newTarget.setBody(target.getBody());
-			newTarget.setUrl(target.getUrl());
-			newTarget.setStatus(3);
-			newTarget.setDate(new Date());
-			targetRepo.save(newTarget);
+			TargetClass saveObj = new TargetClass();
+			saveObj.setId(target.getId());
+			saveObj.setBody(target.getBody());
+			saveObj.setCategoryId(target.getCategoryId());
+			saveObj.setDate(target.getDate());
+			saveObj.setImgurl(target.getImgurl());
+			saveObj.setStatus(3);
+			saveObj.setTitle(target.getTitle());
+			saveObj.setUrl(target.getUrl());
+
+			targetRepo.save(saveObj);
 			count++;
 
 

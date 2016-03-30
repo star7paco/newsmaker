@@ -1,11 +1,11 @@
 package com.s7soft.gae.news.parser;
 
 import java.io.IOException;
-import java.util.Date;
 import java.util.List;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Node;
 import org.jsoup.select.Elements;
 
 import com.google.appengine.api.datastore.Text;
@@ -21,17 +21,26 @@ public class Parser {
 		return targetList;
 	}
 
-	public static TargetClass parsing(TargetClass target, ParserClass parser) {
-		TargetClass newTarget = new TargetClass();
+	public static TargetClass parsing(TargetClass input, ParserClass parser) {
+		TargetClass target = new TargetClass();
+		target.setId(input.getId());
+		target.setBody(input.getBody());
+		target.setCategoryId(input.getCategoryId());
+		target.setDate(input.getDate());
+		target.setImgurl(input.getImgurl());
+		target.setStatus(input.getStatus());
+		target.setTitle(input.getTitle());
+		target.setUrl(input.getUrl());
+
 		if (parser.getNewsLinkTag() != null
 				&& !parser.getNewsLinkTag().isEmpty()) {
-			newTarget.setId(target.getId());
-			newTarget.setCategoryId(target.getCategoryId());
-			newTarget.setTitle(target.getTitle());
-			newTarget.setUrl(newsLinkChange(target, parser.getNewsLinkTag()));
-			newTarget.setStatus(1);
-			newTarget.setDate(new Date());
-			return newTarget;
+			String imgurl = getImage(target);
+
+			target.setUrl(newsLinkChange(target, parser.getNewsLinkTag()));
+			target.setStatus(1);
+
+			target.setImgurl(imgurl);
+			return target;
 		}
 		return getNews(target, parser);
 
@@ -52,7 +61,6 @@ public class Parser {
 	}
 
 	public static TargetClass getNews(TargetClass target, ParserClass parser) {
-		TargetClass newTarget = new TargetClass();
 		try {
 			Document doc = Jsoup.connect(target.getUrl()).get();
 
@@ -73,17 +81,40 @@ public class Parser {
 			}
 
 
-			newTarget.setId(target.getId());
-			newTarget.setCategoryId(target.getCategoryId());
-			newTarget.setUrl(target.getUrl());
-			newTarget.setTitle(title);
-			newTarget.setBody(new Text(body));
-			newTarget.setStatus(2);
-			newTarget.setDate(new Date());
+			target.setTitle(title);
+			target.setBody(new Text(body));
+
+			if( title == null || title.length() == 0 || body == null || body.length() == 0){
+				target.setStatus(4);
+			}else{
+				target.setStatus(2);
+			}
+
 
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		return newTarget;
+		return target;
 	}
+	public static String getImage(TargetClass target) {
+		return getImage(target.getUrl());
+	}
+
+	public static String getImage(String url) {
+
+		try {
+			Document doc = Jsoup.connect(url).get();
+
+			Elements elements = doc.getElementsByClass("image");
+
+			Node node = elements.get(0).childNode(0);
+
+			return node.attr("data-src");
+
+		} catch (Exception e) {
+		}
+
+		return "";
+	}
+
 }

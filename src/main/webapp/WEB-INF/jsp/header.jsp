@@ -3,21 +3,24 @@
 <%@ page import="com.google.appengine.api.users.User"%>
 <%@ page import="com.google.appengine.api.users.UserServiceFactory" %>
 <%@ page import="com.google.appengine.api.users.UserService" %>
+
 <style type="text/css">
 p {color:blue; line-height:1.5;}
 h1 {font-size: 14pt;font-weight: normal;}
 </style>
+<header>
+<div align="center">
 <%
 if (UserServiceFactory.getUserService().getCurrentUser() != null) { %>
-ようこそ! あなたは <b><%=UserServiceFactory.getUserService().getCurrentUser() .getNickname()%></b>
-という名前でログインしています。<a href='<%=UserServiceFactory.getUserService().createLogoutURL("/")%>'>サインアウト</a>
+<b><%=UserServiceFactory.getUserService().getCurrentUser() .getNickname()%></b>님 환영합니다.
+<a href='<%=UserServiceFactory.getUserService().createLogoutURL("/")%>'>Logout</a>
 <%
 	if( AdminUtil.isAdminUser() ){
 		%><a href='/admin'>admin</a><%
 	}
 
 } else {%>
-こんにちは! こちらから<a href='<%=UserServiceFactory.getUserService().createLoginURL("/")%>'>サインイン</a> してください!
+환영합니다. <a href='<%=UserServiceFactory.getUserService().createLoginURL("/")%>'>Login</a>
 <%}%>
 <script>
   (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
@@ -44,4 +47,6 @@ if (UserServiceFactory.getUserService().getCurrentUser() != null) { %>
   })();
 </script>
 <gcse:search></gcse:search>
+</div>
+</header>
 

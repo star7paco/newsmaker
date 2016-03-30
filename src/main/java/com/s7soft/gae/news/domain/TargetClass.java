@@ -23,6 +23,8 @@ public class TargetClass{
 
 	private String url;
 	private String title;
+
+	private String imgurl;
 	private Text body;
 
 	private Date date;
@@ -95,6 +97,14 @@ public class TargetClass{
 
 	public void setBody(Text body) {
 		this.body = body;
+	}
+
+	public String getImgurl() {
+		return imgurl;
+	}
+
+	public void setImgurl(String imgurl) {
+		this.imgurl = imgurl;
 	}
 
 

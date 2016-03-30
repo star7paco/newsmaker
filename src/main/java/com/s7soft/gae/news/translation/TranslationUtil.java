@@ -88,18 +88,28 @@ public class TranslationUtil {
 	public static PostClass trans(TargetClass target) throws Exception{
 		PostClass post = new PostClass();
 
+		post.setImgurl(target.getImgurl());
 		post.setCategoryId(target.getCategoryId());
 		post.setOriginalTitle(target.getTitle());
 		post.setOriginalBody(target.getBody());
-		post.setClickCount(0);
-		post.setStatus(1);
 		post.setUrl(target.getUrl());
 
-
-		post.setTitle( getChangeHtml(post.getOriginalTitle()) );
-		post.setBody( new Text(getChangeHtml(post.getStringOriginalBody())) );
-
+		post.setClickCount(0);
+		post.setStatus(1);
 		post.setDate(new Date());
+
+
+		String title = getChangeHtml(target.getTitle());
+		String body = getChangeHtml(target.getStringBody());
+
+		if(title == null || title.trim().length() < 1 || body == null || body.trim().length() < 1){
+			throw new Exception("error trans");
+		}
+
+		post.setTitle( title );
+		post.setBody( new Text(body) );
+
+
 
 		return post;
 	}

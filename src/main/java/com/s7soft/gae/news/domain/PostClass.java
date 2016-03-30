@@ -26,7 +26,7 @@ public class PostClass {
 
 	private String originalTitle;
 	private Text originalBody;
-
+	private String imgurl;
 	private Date date;
 	private int status;
 	private int clickCount;
@@ -74,6 +74,33 @@ public class PostClass {
 
 	public String getTitle() {
 		return title;
+	}
+
+	public String getStringTitle() {
+
+		int stringlan = 30;
+
+		if(title != null && title.trim().length() > 0){
+			return title;
+		}else{
+
+			String body = getStringBody();
+			if(body.length() > stringlan){
+				return " - " + body.substring(0 , stringlan)+"...";
+			}else{
+				return " - " + body+"...";
+			}
+
+
+		}
+	}
+
+	public String getImgTag() {
+		if(imgurl != null && imgurl.trim().length() > 0){
+			return "<img src=\""+imgurl+"\" align=\"middle\">";
+		}else{
+			return "";
+		}
 	}
 
 	public void setTitle(String title) {
@@ -136,6 +163,17 @@ public class PostClass {
 
 	public void setCategoryId(Long categoryId) {
 		this.categoryId = categoryId;
+	}
+
+	public String getImgurl() {
+		return imgurl;
+	}
+
+	public void setImgurl(String imgurl) {
+		if(imgurl == null){
+			imgurl = "";
+		}
+		this.imgurl = imgurl;
 	}
 
 
