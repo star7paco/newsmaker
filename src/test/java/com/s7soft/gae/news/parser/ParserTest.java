@@ -5,8 +5,6 @@ import static org.assertj.core.api.Assertions.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Test;
-
 import com.s7soft.gae.news.domain.CategoryClass;
 import com.s7soft.gae.news.domain.ParserClass;
 import com.s7soft.gae.news.domain.TargetClass;
@@ -16,7 +14,6 @@ public class ParserTest {
 
 
 
-	@Test
 	public void parsering() {
 
 		TargetClass target = new TargetClass();

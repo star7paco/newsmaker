@@ -8,7 +8,7 @@
 	<context:annotation-config />
 	<mvc:annotation-driven/>
 	<!-- Static Resource Config -->
-	<mvc:resources location="/WEB-INF/static/" mapping="/static/**" />
+	<mvc:resources location="/WEB-INF/static/" mapping="/**" />
 	<!-- ViewResolver Config -->
 	<bean id="viewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
 		<property name="prefix" value="/WEB-INF/jsp/" />

@@ -87,7 +87,6 @@ public class TranslationUtil {
 
 	public static PostClass trans(TargetClass target) throws Exception{
 		PostClass post = new PostClass();
-
 		post.setImgurl(target.getImgurl());
 		post.setCategoryId(target.getCategoryId());
 		post.setOriginalTitle(target.getTitle());
@@ -101,6 +100,8 @@ public class TranslationUtil {
 
 		String title = getChangeHtml(target.getTitle());
 		String body = getChangeHtml(target.getStringBody());
+
+		title = title.replaceAll("<.+?>", "");
 
 		if(title == null || title.trim().length() < 1 || body == null || body.trim().length() < 1){
 			throw new Exception("error trans");

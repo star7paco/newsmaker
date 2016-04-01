@@ -1,35 +1,58 @@
 <%@page import="com.s7soft.gae.news.adsense.AdSense"%>
 <%@ page contentType="text/html; charset=UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<div class="container">
 <%= AdSense.MbAdtop %>
-<h3>news (${page})</h3>
-<div align="center">
-<main>
-<article>
-<c:forEach var="post" items="${postList.content}">
-<p><a href="/post/${post.id}?page=${page}">${post.imgTag}${post.stringTitle}</a><i style="font-size: 10px;">${post.dateTime}(${post.clickCount})</i></p>
-<br><br>
-</c:forEach>
-</article>
 
+<hr>
+<c:forEach var="post" items="${postList.content}">
+<div class="media">
+  <div class="media-left">
+   <a href="/post/${post.id}?page=${page}">
+     ${post.imgTag}
+   </a>
+  </div>
+  <div class="media-body">
+   <a href="/post/${post.id}?page=${page}">
+    <h4 class="media-heading"><h1>${post.stringTitle}</h1></h4>
+    ${post.dateTime}<span class="badge">${post.clickCount}</span>
+    </a>
+  </div>
+</div>
+<hr>
+</c:forEach>
 <%= AdSense.MbAdfin %>
+
+
+<nav>
+ <ul class="pager">
+  <c:choose>
+   <c:when test="${page == 0}">
+    <li class="previous disabled"><a href="#"><span aria-hidden="true">&larr;</span>Newer</a></li></c:when>
+   <c:otherwise>
+    <li class="previous"><a href="/post-list/${page-1}"><span aria-hidden="true">&larr;</span>Newer</a></li></c:otherwise>
+  </c:choose>
+  <li class="page-no"> ${page}</li>
+  <li class="next"><a href="/post-list/${page+1}">Older<span aria-hidden="true">&rarr;</span></a></li>
+ </ul>
+</nav>
+
+<div class=".col-xs-12 .col-md-8">
+<!-- google Site in Search -->
+<script>
+  (function() {
+    var cx = '009245048745248643837:8xh5ivi5mhi';
+    var gcse = document.createElement('script');
+    gcse.type = 'text/javascript';
+    gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//cse.google.com/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0];
+    s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+<gcse:search></gcse:search>
 </div>
-<div>
-<table border="0" width="95%">
- <tr>
-  <td align="center">
-   <c:if test="${page == 0}">
-    &larr; 0 page
-   </c:if>
-   <c:if test="${page != 0}">
-    <a href="/post-list/${page-1}">&larr; ${page-1} page</a>
-   </c:if>
-  </td>
-  <td align="center">
-       <a href="/post-list/${page+1}">${page+1} page &rarr;</a>
-  </td>
- </tr>
-</table>
+
 </div>
-</main>
 

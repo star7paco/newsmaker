@@ -81,7 +81,7 @@ public class PostClass {
 		int stringlan = 30;
 
 		if(title != null && title.trim().length() > 0){
-			return title;
+			return title.replaceAll("<.+?>", "");
 		}else{
 
 			String body = getStringBody();
@@ -97,7 +97,7 @@ public class PostClass {
 
 	public String getImgTag() {
 		if(imgurl != null && imgurl.trim().length() > 0){
-			return "<img src=\""+imgurl+"\" align=\"middle\">";
+			return "<img class=\"media-object\" src=\""+imgurl+"\">";
 		}else{
 			return "";
 		}
@@ -119,7 +119,7 @@ public class PostClass {
 		if(body!=null){
 			return body.getValue();
 		}else{
-			return null;
+			return "";
 		}
 	}
 

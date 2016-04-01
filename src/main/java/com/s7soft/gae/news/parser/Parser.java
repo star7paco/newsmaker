@@ -54,8 +54,7 @@ public class Parser {
 			Elements elements = doc.getElementsByClass(key);
 
 			return elements.get(0).attr("href");
-		} catch (IOException e) {
-			e.printStackTrace();
+		} catch (Exception e) {
 		}
 		return "";
 	}

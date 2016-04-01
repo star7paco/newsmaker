@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -155,10 +156,11 @@ public class NewsController {
 			page = 0;
 		}
 
-		Pageable pageable = new PageRequest(page, 10 , Direction.DESC , "date");
+		Pageable pageable = new PageRequest(page, 12 , Direction.DESC , "date");
 		Page<PostClass> postList = postRepo.findByStatus(1, pageable);
 		model.addAttribute("postList", postList);
 		model.addAttribute("page", page);
+		model.addAttribute("title", "news" + page);
 		return "post-list";
 	}
 
@@ -170,9 +172,10 @@ public class NewsController {
 		} catch (Exception e) {
 		}
 
-		PostClass post = postRepo.findOne(postId);
-		if(post != null){
-
+		PostClass post = new PostClass();
+		PostClass dsPost = postRepo.findOne(postId);
+		if(dsPost != null){
+			BeanUtils.copyProperties(dsPost, post);
 			// titleの空白をなくす。
 			if(post.getTitle().trim().length() == 0 ){
 				try {
@@ -186,6 +189,7 @@ public class NewsController {
 
 			post.setClickCount(post.getClickCount()+1);
 			postRepo.save(post);
+			model.addAttribute("title", post.getStringTitle());
 		}
 		model.addAttribute("page", intPage);
 		model.addAttribute("post", post);
@@ -282,8 +286,10 @@ public class NewsController {
 
 			// 一致するparserが無い
 			if(parser == null){
-				target.setStatus(0);
-				targetRepo.save(target);
+				TargetClass newTarget = new TargetClass();
+				BeanUtils.copyProperties(target, newTarget);
+				newTarget.setStatus(0);
+				targetRepo.save(newTarget);
 				continue;
 			}
 			System.out.println("parser : " +parser.getKey());
@@ -307,7 +313,7 @@ public class NewsController {
 //				break;
 //			}
 
-			if(count > 5){
+			if(count > 3){
 				break;
 			}
 
@@ -344,20 +350,13 @@ public class NewsController {
 
 			// 一致するparserが無い
 			TargetClass saveObj = new TargetClass();
-			saveObj.setId(target.getId());
-			saveObj.setBody(target.getBody());
-			saveObj.setCategoryId(target.getCategoryId());
-			saveObj.setDate(target.getDate());
-			saveObj.setImgurl(target.getImgurl());
+			BeanUtils.copyProperties(target, saveObj);
 			saveObj.setStatus(3);
-			saveObj.setTitle(target.getTitle());
-			saveObj.setUrl(target.getUrl());
-
 			targetRepo.save(saveObj);
 			count++;
 
 
-			if(count > 5){
+			if(count > 3){
 				break;
 			}
 		}
