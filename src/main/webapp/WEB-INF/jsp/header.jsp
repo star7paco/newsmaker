@@ -8,6 +8,7 @@
  <meta charset="utf-8">
 <title>${title}</title>
 <meta name=”description=” content="${title}">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <script>
   (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
   (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -18,12 +19,8 @@
   ga('send', 'pageview');
 
 </script>
-<style type="text/css">
-p {color:blue; line-height:1.5;}
-h1 {font-size: 14pt;font-weight: normal;}
-</style>
 <!-- Bootstrap core CSS -->
-<link href="/css/bootstrap.min.css" rel="stylesheet">
+<link href="http://getbootstrap.com/dist/css/bootstrap.min.css" rel="stylesheet">
 <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
 <!--[if lt IE 9]>
   <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>

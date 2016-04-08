@@ -11,6 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -28,12 +29,14 @@ import com.s7soft.gae.news.repository.PostRespository;
 import com.s7soft.gae.news.repository.TargetRespository;
 import com.s7soft.gae.news.rss.RssReader;
 import com.s7soft.gae.news.translation.TranslationUtil;
+import com.s7soft.gae.news.util.HtmlUtil;
 
 @Controller
 public class NewsController {
 
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(NewsController.class);
+	private static final int TWENTY_SECOND = 20 * 1000;
 
 	@Autowired
 	ParserRespository parserRepo;
@@ -55,22 +58,37 @@ public class NewsController {
 	@RequestMapping("/admin")
 	String admin(Model model) {
 
-		long categoryCount = categoryRepo.count();
-//		long parserCount = parserRepo.count();
-//		long postCount = postRepo.count();
-//		long targetCount = targetRepo.count();
+		long categoryCount = 0;
+		long parserCount = 0;
+		long postCount = 0;
+		long targetCount = 0;
+
+		try {
+
+			categoryCount = categoryRepo.count();
+			parserCount = parserRepo.count();
+			postCount = postRepo.count();
+			targetCount = targetRepo.count();
+
+		} catch (Exception e) {
+		}
+
+
 		if(categoryCount < 1){
 			System.out.println("***************  Setup Default  ***************");
-			categoryRepo.save(CategoryClass.getDefault());
+			for(CategoryClass category : CategoryClass.getDefault()){
+				categoryRepo.save(category);
+			}
+
 			for(ParserClass parser : ParserClass.getDefault()){
 				parserRepo.save(parser);
 			}
 		}
 
 		model.addAttribute("categoryCount", categoryCount);
-//		model.addAttribute("parserCount", parserCount);
-//		model.addAttribute("postCount", postCount);
-//		model.addAttribute("targetCount", targetCount);
+		model.addAttribute("parserCount", parserCount);
+		model.addAttribute("postCount", postCount);
+		model.addAttribute("targetCount", targetCount);
 
 
 		return "admin";
@@ -174,9 +192,10 @@ public class NewsController {
 
 		PostClass post = new PostClass();
 		PostClass dsPost = postRepo.findOne(postId);
+
 		if(dsPost != null){
 			BeanUtils.copyProperties(dsPost, post);
-			// titleの空白をなくす。
+			// data 後修正 titleの空白をなくす。
 			if(post.getTitle().trim().length() == 0 ){
 				try {
 					String title = TranslationUtil.getChangeHtml(post.getOriginalTitle());
@@ -185,12 +204,27 @@ public class NewsController {
 					// TODO 自動生成された catch ブロック
 					e.printStackTrace();
 				}
+			}else if(post.getTitle().startsWith("<")){
+				post.setTitle(HtmlUtil.delTag(post.getTitle()));
+				post.setOriginalTitle(HtmlUtil.delTag(post.getOriginalTitle()));
 			}
 
 			post.setClickCount(post.getClickCount()+1);
 			postRepo.save(post);
 			model.addAttribute("title", post.getStringTitle());
+
+			// カテゴリ情報追加 TODO DBではなくキャッシュしたい
+			if(dsPost.getCategoryId() != null){
+				CategoryClass category = categoryRepo.findOne(dsPost.getCategoryId());
+				model.addAttribute("category", category);
+			}else{
+				CategoryClass category = new CategoryClass();
+				category.setName("News");
+				model.addAttribute("category", category);
+			}
 		}
+
+
 		model.addAttribute("page", intPage);
 		model.addAttribute("post", post);
 		return "post";
@@ -205,20 +239,28 @@ public class NewsController {
 	/**  target */
 	@RequestMapping("admin/target-list")
 	String targetList(Model model) {
-		return targetList(0, model);
+		return targetList(0, 0, model);
 	}
 
 	/**  target */
 	@RequestMapping("admin/target-list/{Id}")
-	String targetList(@PathVariable("Id") Integer page, Model model) {
-		List<TargetClass> targetList = targetRepo.findAll();
+	String targetList(@PathVariable("Id") Integer page, @Param("status") Integer status, Model model) {
+		if(page  < 0){
+			page = 0;
+		}
+		if(status == null){
+			status = 0;
+		}
+		Pageable pageable = new PageRequest(page, 12 , Direction.DESC , "date");
+		Page<TargetClass> targetList = targetRepo.findByStatus(status, pageable);
 		model.addAttribute("targetList", targetList);
 		model.addAttribute("page", page);
+		model.addAttribute("status", status);
 		return "target-list";
 	}
 
 	/** cron job */
-	@RequestMapping("rss-read")
+	@RequestMapping("cron/rss-read")
 	String rssRead() {
 		LOGGER.info("STAR RssRead");
 		List<CategoryClass> categoryList = categoryRepo.findAll();
@@ -241,8 +283,9 @@ public class NewsController {
 	}
 
 	/** cron job */
-	@RequestMapping("post-maker")
+	@RequestMapping("cron/post-maker")
 	String postMaker() {
+		long start = System.currentTimeMillis();
 		LOGGER.info("STAR postMaker");
 //		MemcacheService syncCache = MemcacheServiceFactory.getMemcacheService();
 //		syncCache.setErrorHandler(ErrorHandlers
@@ -268,7 +311,11 @@ public class NewsController {
 		int count = 0;
 		List<TargetClass> targetList = targetRepo.findByStatus(1);
 		for (TargetClass target : targetList) {
-
+			count++;
+//			if(count > 3){
+			if( start + TWENTY_SECOND < System.currentTimeMillis()  ){
+				break;
+			}
 
 			System.out.println("targetList size : " +targetList.size());
 
@@ -295,7 +342,7 @@ public class NewsController {
 			System.out.println("parser : " +parser.getKey());
 			System.out.println("target : " +target.getUrl());
 
-			count++;
+
 			TargetClass saveObj = Parser.parsing(target, parser);
 			System.out.println("ret Target: " +saveObj.getUrl());
 			targetRepo.save(saveObj);
@@ -313,29 +360,32 @@ public class NewsController {
 //				break;
 //			}
 
-			if(count > 3){
-				break;
-			}
 
 		}
-		LOGGER.info("END postMaker");
+		LOGGER.info("END postMaker : " + count);
 		return "index";
 	}
 
 
 	/** cron job */
-	@RequestMapping("trans")
+	@RequestMapping("cron/trans")
 	String trans() {
-		LOGGER.info("STAR trans");
+		long start = System.currentTimeMillis();
+		LOGGER.info("STAR trans ");
 
 		int count = 0;
 		List<TargetClass> targetList = targetRepo.findByStatus(2);
 
 		for (TargetClass target : targetList) {
+			count++;
+//			if(count > 3){
+			if( start + TWENTY_SECOND < System.currentTimeMillis()  ){
+				break;
+			}
 			System.out.println("targetList size : " +targetList.size());
 
 			// 重複除去
-			List<PostClass> list =postRepo.findByUrl(target.getUrl());
+			List<PostClass> list = postRepo.findByUrl(target.getUrl());
 			if(list.size() < 1){
 				try {
 					PostClass post = TranslationUtil.trans(target);
@@ -353,15 +403,10 @@ public class NewsController {
 			BeanUtils.copyProperties(target, saveObj);
 			saveObj.setStatus(3);
 			targetRepo.save(saveObj);
-			count++;
 
-
-			if(count > 3){
-				break;
-			}
 		}
 
-		LOGGER.info("END trans");
+		LOGGER.info("END trans : "+count);
 		return "index";
 	}
 }

@@ -27,6 +27,7 @@ public class PostClass {
 	private String originalTitle;
 	private Text originalBody;
 	private String imgurl;
+	private String videourl;
 	private Date date;
 	private int status;
 	private int clickCount;
@@ -97,11 +98,39 @@ public class PostClass {
 
 	public String getImgTag() {
 		if(imgurl != null && imgurl.trim().length() > 0){
-			return "<img class=\"media-object\" src=\""+imgurl+"\">";
+			String ret = "";
+			String urls[] = imgurl.split("@");
+
+			for(String url : urls){
+				if( url==null || url.isEmpty() ){
+					continue;
+				}
+				ret = ret + "<img class=\"media-object\" src=\""+url+"\">";
+			}
+			return ret;
 		}else{
 			return "";
 		}
 	}
+
+
+	public String getVideoTag() {
+		if(videourl != null && videourl.trim().length() > 0){
+			String ret = "";
+			String urls[] = videourl.split("@");
+
+			for(String url : urls){
+				if( url==null || url.isEmpty() ){
+					continue;
+				}
+				ret = ret + "<iframe width=\"560\" height=\"315\" src=\""+url+"\" frameborder=\"0\" allowfullscreen></iframe>";
+			}
+			return ret;
+		}else{
+			return "";
+		}
+	}
+
 
 	public void setTitle(String title) {
 		this.title = title;
@@ -117,7 +146,7 @@ public class PostClass {
 
 	public String getStringBody() {
 		if(body!=null){
-			return body.getValue();
+			return getImgTag() + body.getValue() + getVideoTag();
 		}else{
 			return "";
 		}
@@ -174,6 +203,14 @@ public class PostClass {
 			imgurl = "";
 		}
 		this.imgurl = imgurl;
+	}
+
+	public String getVideourl() {
+		return videourl;
+	}
+
+	public void setVideourl(String videourl) {
+		this.videourl = videourl;
 	}
 
 
