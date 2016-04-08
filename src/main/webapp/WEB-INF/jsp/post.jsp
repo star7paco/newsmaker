@@ -2,16 +2,17 @@
 <%@ page contentType="text/html; charset=UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 
-<%= AdSense.MbAdtop %>
+<%= AdSense.AutoTop %>
 <div class="container">
 <div class="panel panel-default">
- <div class="panel-heading"><h1>${post.stringTitle}</h1></div>
-  <div class="panel-body">
-    ${post.imgTag}
-    <p>${post.stringBody}</p>
-  </div>
+ <div class="panel-heading">${post.stringTitle}</div>
+ <div class="panel-body">
+   [${category.name}] ${post.dateTime} <span class="badge">${post.clickCount}</span>
+   <p>${post.stringBody}</p>
+ </div>
 </div>
-
+<a href="${post.url}">원문보기</a>
+<%= AdSense.MbAdfin %>
 <hr>
 
 <%

@@ -88,6 +88,7 @@ public class TranslationUtil {
 	public static PostClass trans(TargetClass target) throws Exception{
 		PostClass post = new PostClass();
 		post.setImgurl(target.getImgurl());
+		post.setVideourl(target.getVideourl());;
 		post.setCategoryId(target.getCategoryId());
 		post.setOriginalTitle(target.getTitle());
 		post.setOriginalBody(target.getBody());
@@ -104,6 +105,7 @@ public class TranslationUtil {
 		title = title.replaceAll("<.+?>", "");
 
 		if(title == null || title.trim().length() < 1 || body == null || body.trim().length() < 1){
+			System.out.println(target.getTitle());
 			throw new Exception("error trans");
 		}
 

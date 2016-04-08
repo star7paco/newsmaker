@@ -2,27 +2,28 @@
 <%@ page contentType="text/html; charset=UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <div class="container">
-<%= AdSense.MbAdtop %>
+<%= AdSense.AutoTop %>
+<%=session.getAttribute("page")%>
 
 <hr>
+<div class="bs-example">
 <c:forEach var="post" items="${postList.content}">
 <div class="media">
-  <div class="media-left">
-   <a href="/post/${post.id}?page=${page}">
+  <div class="media-top">
+   <a href="/post/${post.id}">
      ${post.imgTag}
    </a>
   </div>
   <div class="media-body">
-   <a href="/post/${post.id}?page=${page}">
-    <h4 class="media-heading"><h1>${post.stringTitle}</h1></h4>
-    ${post.dateTime}<span class="badge">${post.clickCount}</span>
+   <a href="/post/${post.id}">
+    <h4 class="media-heading">${post.stringTitle}</h4>
+    <%=session.getAttribute("page")%> ${post.dateTime} <span class="badge">${post.clickCount}</span>
     </a>
   </div>
 </div>
 <hr>
 </c:forEach>
-<%= AdSense.MbAdfin %>
-
+</div>
 
 <nav>
  <ul class="pager">

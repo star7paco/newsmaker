@@ -12,14 +12,25 @@ import org.springframework.stereotype.Component;
 @Component
 public class CategoryClass {
 
-	public static CategoryClass getDefault(){
+	public static CategoryClass[] getDefault(){
+		CategoryClass categorys[] = new CategoryClass[2];
 		CategoryClass category = new CategoryClass();
 		category.setName("Yahoo top");
 		category.setRssUrl("http://news.yahoo.co.jp/pickup/rss.xml");
 		category.setUrl("http://www.yahoo.co.jp/");
 		category.setStatus(1);
 		category.setDate(new Date());
-		return category;
+		categorys[0] = category;
+
+		CategoryClass category2 = new CategoryClass();
+		category2.setStatus(1);
+		category2.setName("AKB LOVE");
+		category2.setUrl("http://akb.48lover.com/");
+		category2.setRssUrl("http://akb.48lover.com/rss");
+		category2.setDate(new Date());
+		categorys[1] = category2;
+
+		return categorys;
 	}
 
 	@Id
