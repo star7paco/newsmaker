@@ -1,6 +1,7 @@
 package com.s7soft.gae.news.filter;
 
 import java.io.IOException;
+import java.net.URL;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -8,13 +9,13 @@ import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.s7soft.gae.news.admin.AdminUtil;
 
-public class AdminFilter implements Filter {
+public class DefaultFilter implements Filter {
 
-	public AdminFilter() {
+	public DefaultFilter() {
 	}
 
 	@Override
@@ -25,11 +26,15 @@ public class AdminFilter implements Filter {
 	public void doFilter(ServletRequest req, ServletResponse res,
 			FilterChain chain) throws IOException, ServletException {
 
-		if (AdminUtil.isAdminUser()) {
-		}else{
-			((HttpServletResponse)res).sendRedirect("/");
-			return;
-		}
+		URL url = new URL(((HttpServletRequest)req).getRequestURL().toString());
+	    String host  = url.getHost();
+
+	    if(!host.contains("localhost") && !host.contains("news.s7soft.com")){
+	    	((HttpServletResponse)res).sendRedirect("http://news.s7soft.com"+url.getFile());
+	    	return;
+	    }
+
+
 		chain.doFilter(req, res);
 	}
 

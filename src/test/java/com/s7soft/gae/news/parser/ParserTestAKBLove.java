@@ -9,7 +9,7 @@ import com.s7soft.gae.news.domain.ParserClass;
 import com.s7soft.gae.news.domain.TargetClass;
 import com.s7soft.gae.news.rss.RssReader;
 
-public class ParserTest2 {
+public class ParserTestAKBLove {
 
 	String sample[] = {
 			"http://zasshi.news.yahoo.co.jp/article?a=20160325-00010000-friday-ent",
@@ -21,9 +21,9 @@ public class ParserTest2 {
 	@Test
 	public void parsering() {
 		CategoryClass category = new CategoryClass();
-		category.setName("야후일본 톱 뉴스");
-		category.setUrl("http://www.yahoo.co.jp/");
-		category.setRssUrl("http://news.yahoo.co.jp/pickup/rss.xml");
+		category.setName("AKB LOVE");
+		category.setUrl("http://akb.48lover.com/");
+		category.setRssUrl("http://akb.48lover.com/rss");
 
 		parsering(category);
 	}
@@ -37,9 +37,12 @@ public class ParserTest2 {
 					continue;
 				}
 
-
 				TargetClass ret = Parser.parsing(target, parser);
 				System.out.println(ret.getUrl());
+				System.out.println(ret.getImgurl());
+				System.out.println(ret.getVideourl());
+				System.out.println(ret.getTitle());
+				System.out.println(ret.getStringBody());
 
 				String imageLink = Parser.getImage(target);
 				System.out.println(imageLink);
@@ -51,10 +54,37 @@ public class ParserTest2 {
 
 	@Test
 	public void testImg() {
-		String postUrl = "http://news.yahoo.co.jp/pickup/6196184";
+		String postUrl = "http://akb.48lover.com/log/29059";
 
 		String imageLink = Parser.getImage(postUrl);
 		System.out.println(imageLink);
+
+	}
+
+
+
+	@Test
+	public void testdata() {
+		String postUrl = "http://akb.48lover.com/log/29105";
+		TargetClass target = new TargetClass();
+		target.setUrl(postUrl);
+
+		for(ParserClass parser: ParserClass.getDefault()){
+			if(!target.getUrl().contains(parser.getKey())){
+				continue;
+			}
+
+			TargetClass ret = Parser.parsing(target, parser);
+			System.out.println(ret.getUrl());
+			System.out.println(ret.getImgurl());
+			System.out.println(ret.getVideourl());
+			System.out.println(ret.getTitle());
+			System.out.println(ret.getStringBody());
+
+			String imageLink = Parser.getImage(target);
+			System.out.println(imageLink);
+
+		}
 
 	}
 }

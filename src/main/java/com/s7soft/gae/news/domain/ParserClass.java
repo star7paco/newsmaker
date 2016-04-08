@@ -9,12 +9,14 @@ import javax.persistence.Id;
 
 import org.springframework.stereotype.Component;
 
+import com.s7soft.gae.news.util.HtmlUtil;
+
 @Entity
 @Component
 public class ParserClass implements Serializable{
 
 	public static ParserClass[] getDefault(){
-		ParserClass[] parsers = new ParserClass[3];
+		ParserClass[] parsers = new ParserClass[4];
 		ParserClass parser0 = new ParserClass();
 		parser0.key = "news.yahoo.co.jp/pickup";
 		parser0.name = "yahoo next page";
@@ -38,9 +40,22 @@ public class ParserClass implements Serializable{
 		parser2.status = 1;
 		parser2.setDate(new Date());
 
+		ParserClass parser3 = new ParserClass();
+		parser3.key = "akb.48lover.com";
+		parser3.name = "AKB48 Love";
+		parser3.startTitle = HtmlUtil.convertSanitize("<h1 class=\"title\">");
+		parser3.endTitle = HtmlUtil.convertSanitize("</h1>");
+		parser3.startBody = HtmlUtil.convertSanitize("<div class=\"post-body\">");
+		parser3.endBody = HtmlUtil.convertSanitize("</p>");
+		parser3.status = 1;
+		parser3.setDate(new Date());
+
+
+
 		parsers[0] = parser0;
 		parsers[1] = parser1;
 		parsers[2] = parser2;
+		parsers[3] = parser3;
 		return parsers;
 	}
 
@@ -54,6 +69,13 @@ public class ParserClass implements Serializable{
 	private String newsLinkTag;
 	private String titleTag;
 	private String bodyTag;
+
+
+	private String startTitle;
+	private String endTitle;
+
+	private String startBody;
+	private String endBody;
 
 	// 締め（処理最後に行う作業）
 	private String closing;
@@ -116,6 +138,33 @@ public class ParserClass implements Serializable{
 	}
 	public void setClosing(String closing) {
 		this.closing = closing;
+	}
+	public String getStartTitle() {
+		return startTitle;
+	}
+
+
+
+	public void setStartTitle(String startTitle) {
+		this.startTitle =  HtmlUtil.convertSanitize(startTitle);
+	}
+	public String getEndTitle() {
+		return endTitle;
+	}
+	public void setEndTitle(String endTitle) {
+		this.endTitle =  HtmlUtil.convertSanitize(endTitle);
+	}
+	public String getStartBody() {
+		return startBody;
+	}
+	public void setStartBody(String startBody) {
+		this.startBody =  HtmlUtil.convertSanitize(startBody);
+	}
+	public String getEndBody() {
+		return endBody;
+	}
+	public void setEndBody(String endBody) {
+		this.endBody =  HtmlUtil.convertSanitize(endBody);
 	}
 
 

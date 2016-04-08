@@ -25,6 +25,7 @@ public class TargetClass{
 	private String title;
 
 	private String imgurl;
+	private String videourl;
 	private Text body;
 
 	private Date date;
@@ -91,12 +92,16 @@ public class TargetClass{
 		if(body!=null){
 			return body.getValue();
 		}else{
-			return null;
+			return "";
 		}
 	}
 
 	public void setBody(Text body) {
 		this.body = body;
+	}
+
+	public void addBody(String body) {
+		this.body = new Text(getStringBody() + body);
 	}
 
 	public String getImgurl() {
@@ -105,6 +110,34 @@ public class TargetClass{
 
 	public void setImgurl(String imgurl) {
 		this.imgurl = imgurl;
+	}
+
+	public void addImgurl(String imgurl) {
+
+		if(this.imgurl != null && !this.imgurl.isEmpty() ){
+			this.imgurl = this.imgurl + " @ " + imgurl;
+		}else{
+			setImgurl(imgurl);
+		}
+
+
+	}
+
+	public String getVideourl() {
+		return videourl;
+	}
+
+	public void setVideourl(String videourl) {
+		this.videourl = videourl;
+	}
+
+	public void addVideourl(String videourl) {
+
+		if(this.videourl != null && !this.videourl.isEmpty() ){
+			this.videourl = this.videourl + " @ " + videourl;
+		}else{
+			setVideourl(videourl);
+		}
 	}
 
 
