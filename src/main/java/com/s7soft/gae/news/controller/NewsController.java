@@ -285,7 +285,11 @@ public class NewsController {
 	/** cron job */
 	@RequestMapping("cron/post-maker")
 	String postMaker() {
+<<<<<<< HEAD
 		long start = System.currentTimeMillis();
+=======
+//		long start = System.currentTimeMillis();
+>>>>>>> branch 'feature/#1' of https://github.com/star7paco/newsmaker.git
 		LOGGER.info("STAR postMaker");
 //		MemcacheService syncCache = MemcacheServiceFactory.getMemcacheService();
 //		syncCache.setErrorHandler(ErrorHandlers
@@ -359,7 +363,14 @@ public class NewsController {
 //			default:
 //				break;
 //			}
+<<<<<<< HEAD
 
+=======
+			if(count > 5){
+//			if( start + TWENTY_SECOND < System.currentTimeMillis()  ){
+				break;
+			}
+>>>>>>> branch 'feature/#1' of https://github.com/star7paco/newsmaker.git
 
 		}
 		LOGGER.info("END postMaker : " + count);
@@ -370,7 +381,11 @@ public class NewsController {
 	/** cron job */
 	@RequestMapping("cron/trans")
 	String trans() {
+<<<<<<< HEAD
 		long start = System.currentTimeMillis();
+=======
+//		long start = System.currentTimeMillis();
+>>>>>>> branch 'feature/#1' of https://github.com/star7paco/newsmaker.git
 		LOGGER.info("STAR trans ");
 
 		int count = 0;
@@ -404,6 +419,14 @@ public class NewsController {
 			saveObj.setStatus(3);
 			targetRepo.save(saveObj);
 
+<<<<<<< HEAD
+=======
+
+			if(count > 5){
+//			if( start + TWENTY_SECOND < System.currentTimeMillis()  ){
+				break;
+			}
+>>>>>>> branch 'feature/#1' of https://github.com/star7paco/newsmaker.git
 		}
 
 		LOGGER.info("END trans : "+count);
