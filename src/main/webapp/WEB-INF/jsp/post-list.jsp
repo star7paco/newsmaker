@@ -3,10 +3,6 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <div class="container">
 <%= AdSense.AutoTop %>
-<<<<<<< HEAD
-=======
-<%=session.getAttribute("page")%>
->>>>>>> branch 'feature/#1' of https://github.com/star7paco/newsmaker.git
 
 <hr>
 <div class="bs-example">
@@ -20,11 +16,7 @@
   <div class="media-body">
    <a href="/post/${post.id}">
     <h4 class="media-heading">${post.stringTitle}</h4>
-<<<<<<< HEAD
     ${post.dateTime} <span class="badge">${post.clickCount}</span>
-=======
-    <%=session.getAttribute("page")%> ${post.dateTime} <span class="badge">${post.clickCount}</span>
->>>>>>> branch 'feature/#1' of https://github.com/star7paco/newsmaker.git
     </a>
   </div>
 </div>

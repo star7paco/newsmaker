@@ -9,15 +9,15 @@
 <tr><td>targetCount</td><td>[${targetCount}]</td></tr>
 </table>
 
-<a href="/post-list">post-list</a><br><br>
+<a class="btn btn-primary btn-lg" role="button" href="/post-list">post-list</a><br><br>
 <br><br><br><br>
-<a href="/admin/category-list">category-list</a><br><br>
-<a href="/admin/target-list">target-list</a><br><br>
-<a href="/admin/parser-list">parser-list</a><br><br>
+<a class="btn btn-primary btn-lg" role="button" href="/admin/category-list">category-list</a><br><br>
+<a class="btn btn-primary btn-lg" role="button" href="/admin/target-list">target-list</a><br><br>
+<a class="btn btn-primary btn-lg" role="button" href="/admin/parser-list">parser-list</a><br><br>
 <br><br><br><br>
 -RUN-<br>
-<a class="btn btn-primary btn-lg" role="button" href="/cron/rss-read">/rss-read</a><br><br>
-<a class="btn btn-primary btn-lg" role="button" href="/cron/post-maker">post-maker</a><br><br>
-<a class="btn btn-primary btn-lg" role="button" href="/cron/trans">trans</a><br><br>
+<a class="btn btn-primary btn-lg" role="button" href="/cron/rss-read">rss-read</a>
+<a class="btn btn-primary btn-lg" role="button" href="/cron/post-maker">post-maker</a>
+<a class="btn btn-primary btn-lg" role="button" href="/cron/trans">trans</a>
 
 

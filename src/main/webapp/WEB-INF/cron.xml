@@ -15,18 +15,7 @@
   </cron>
 
   <cron>
-<<<<<<< HEAD
     <url>/cron/trans</url>
-=======
-    <url>/post-maker</url>
-    <description>cron job Rss Read</description>
-    <schedule>every 10 minutes</schedule>
-    <timezone>Asia/Tokyo</timezone>
-  </cron>
-
-  <cron>
-    <url>/trans</url>
->>>>>>> branch 'feature/#1' of https://github.com/star7paco/newsmaker.git
     <description>cron job Translation</description>
     <schedule>every 10 minutes</schedule>
     <timezone>Asia/Tokyo</timezone>
