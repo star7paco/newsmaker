@@ -7,7 +7,6 @@ import java.util.regex.Pattern;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
 import org.jsoup.nodes.Node;
 import org.jsoup.select.Elements;
 
@@ -80,7 +79,6 @@ public class Parser {
 		try {
 			Document doc = Jsoup.connect(target.getUrl()).userAgent("Mozilla/5.0 (Windows NT 6.1; WOW64; rv:5.0) Gecko/20100101 Firefox/5.0").get();
 			String keywords = doc.select("meta[name=keywords]").first().attr("content");
-
 			System.out.println(keywords);
 
 			String html = doc.getAllElements().html();
@@ -99,13 +97,6 @@ public class Parser {
 				target.addVideourl(src);
 			}
 
-			Elements images = doc.select("img[src~=(?i)\\.(png|jpe?g|gif)]");
-			for (Element image : images) {
-			    System.out.println("src : " + image.attr("src"));
-			    System.out.println("height : " + image.attr("height"));
-			    System.out.println("width : " + image.attr("width"));
-			    System.out.println("alt : " + image.attr("alt"));
-			}
 
 			target.setTitle(title);
 			target.addBody(body);
@@ -125,8 +116,6 @@ public class Parser {
 	private static TargetClass getNewsByClassName(TargetClass target, ParserClass parser) {
 		try {
 			Document doc = Jsoup.connect(target.getUrl()).userAgent("Mozilla/5.0 (Windows NT 6.1; WOW64; rv:5.0) Gecko/20100101 Firefox/5.0").get();
-			String keywords = doc.select("meta[name=keywords]").first().attr("content");
-			System.out.println(keywords);
 
 			String title = target.getTitle();
 			String body = "";

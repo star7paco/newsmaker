@@ -7,6 +7,7 @@
 <head>
  <meta charset="utf-8">
 <title>${title}</title>
+
 <meta name="description" content="${title}">
 <meta name="keywords" content="일본,뉴스">
 <meta name="viewport" content="width=device-width, initial-scale=1">
