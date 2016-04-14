@@ -18,14 +18,13 @@ public class ParserTest {
 			"",
 			};
 
-	@Test
+//	@Test
 	public void parsering() {
-		CategoryClass category = new CategoryClass();
-		category.setName("야후일본 톱 뉴스");
-		category.setUrl("http://www.yahoo.co.jp/");
-		category.setRssUrl("http://news.yahoo.co.jp/pickup/rss.xml");
 
-		parsering(category);
+		for (CategoryClass category : CategoryClass.getDefault()) {
+			parsering(category);
+		}
+
 	}
 
 	public void parsering(CategoryClass category ) {
@@ -40,9 +39,7 @@ public class ParserTest {
 
 				TargetClass ret = Parser.parsing(target, parser);
 				System.out.println(ret.getUrl());
-
-				String imageLink = Parser.getImage(target);
-				System.out.println(imageLink);
+				System.out.println(ret.getImgurl());
 
 			}
 

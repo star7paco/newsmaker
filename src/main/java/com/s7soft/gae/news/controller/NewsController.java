@@ -2,9 +2,9 @@ package com.s7soft.gae.news.controller;
 
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -18,6 +18,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.google.appengine.api.memcache.ErrorHandlers;
+import com.google.appengine.api.memcache.MemcacheService;
+import com.google.appengine.api.memcache.MemcacheServiceFactory;
 import com.s7soft.gae.news.domain.CategoryClass;
 import com.s7soft.gae.news.domain.ParserClass;
 import com.s7soft.gae.news.domain.PostClass;
@@ -34,9 +37,8 @@ import com.s7soft.gae.news.util.HtmlUtil;
 @Controller
 public class NewsController {
 
-	private static final Logger LOGGER = LoggerFactory
-			.getLogger(NewsController.class);
-	private static final int TWENTY_SECOND = 20 * 1000;
+	private static final Logger log = Logger.getLogger(NewsController.class.getName());
+	private static final int RUN_TIME = 30 * 1000;
 
 	@Autowired
 	ParserRespository parserRepo;
@@ -59,23 +61,20 @@ public class NewsController {
 	String admin(Model model) {
 
 		long categoryCount = 0;
-		long parserCount = 0;
-		long postCount = 0;
-		long targetCount = 0;
-
 		try {
-
 			categoryCount = categoryRepo.count();
-			parserCount = parserRepo.count();
-			postCount = postRepo.count();
-			targetCount = targetRepo.count();
-
+			model.addAttribute("categoryCount", categoryCount);
 		} catch (Exception e) {
+			model.addAttribute("categoryCount", "-");
 		}
 
 
+		model.addAttribute("parserCount", "-");
+		model.addAttribute("postCount", "-");
+		model.addAttribute("targetCount", "-");
+
 		if(categoryCount < 1){
-			System.out.println("***************  Setup Default  ***************");
+//			System.out.println("***************  Setup Default  ***************");
 			for(CategoryClass category : CategoryClass.getDefault()){
 				categoryRepo.save(category);
 			}
@@ -84,11 +83,6 @@ public class NewsController {
 				parserRepo.save(parser);
 			}
 		}
-
-		model.addAttribute("categoryCount", categoryCount);
-		model.addAttribute("parserCount", parserCount);
-		model.addAttribute("postCount", postCount);
-		model.addAttribute("targetCount", targetCount);
 
 
 		return "admin";
@@ -99,7 +93,7 @@ public class NewsController {
 	String categoryList(Model model) {
 		long categoryCount = categoryRepo.count();
 		List<CategoryClass> categoryList = categoryRepo.findAll();
-		LOGGER.info("test {}", categoryList);
+		log.info("test :"+ categoryList);
 		model.addAttribute("categorylist", categoryList);
 		model.addAttribute("categorycount", categoryCount);
 		return "category-list";
@@ -129,10 +123,10 @@ public class NewsController {
 	/** parser */
 	@RequestMapping("admin/parser-list")
 	String parserList(Model model) {
-		System.out.println("admin/parser-list");
+
 		long parserCount = parserRepo.count();
 		List<ParserClass> parserList = parserRepo.findAll();
-		System.out.println("test : " + parserList);
+
 		model.addAttribute("parserlist", parserList);
 		model.addAttribute("parsercount", parserCount);
 		return "parser-list";
@@ -140,7 +134,6 @@ public class NewsController {
 
 	@RequestMapping("admin/parser-list/{Id}")
 	String parserList(@PathVariable("Id") Long parserId, Model model) {
-		System.out.println("admin/parser-list/{Id}=" + parserId);
 		long parserCount = parserRepo.count();
 		ParserClass parser = parserRepo.findOne(parserId);
 		model.addAttribute("oneparser", parser);
@@ -190,8 +183,20 @@ public class NewsController {
 		} catch (Exception e) {
 		}
 
+		// メモリキャッシュでデータを取得
+		MemcacheService syncCache = MemcacheServiceFactory.getMemcacheService();
+		syncCache.setErrorHandler(ErrorHandlers.getConsistentLogAndContinue(Level.INFO));
+		PostClass dsPost = (PostClass) syncCache.get(postId);
+		if(dsPost == null){
+			dsPost = postRepo.findOne(postId);
+		}
+
+
 		PostClass post = new PostClass();
-		PostClass dsPost = postRepo.findOne(postId);
+
+
+		CategoryClass category = null;
+		String keywords = "";
 
 		if(dsPost != null){
 			BeanUtils.copyProperties(dsPost, post);
@@ -201,42 +206,76 @@ public class NewsController {
 					String title = TranslationUtil.getChangeHtml(post.getOriginalTitle());
 					post.setTitle(title);
 				} catch (Exception e) {
-					// TODO 自動生成された catch ブロック
 					e.printStackTrace();
 				}
-			}else if(post.getTitle().startsWith("<")){
-				post.setTitle(HtmlUtil.delTag(post.getTitle()));
-				post.setOriginalTitle(HtmlUtil.delTag(post.getOriginalTitle()));
+			}
+
+			// data 後修正 タグも削除
+			post.setTitle(HtmlUtil.delTag(post.getTitle()));
+			post.setKeywords(HtmlUtil.delTag(post.getKeywords()));
+			post.setOriginalTitle(HtmlUtil.delTag(post.getOriginalTitle()));
+
+			if( post.getVideourl() != null && post.getVideourl().trim().length() > 0 &&  post.getVideourl().contains("www.facebook.com") ){
+				post.setVideourl("");
 			}
 
 			post.setClickCount(post.getClickCount()+1);
 			postRepo.save(post);
+			syncCache.put(post.getId(), post);
+
 			model.addAttribute("title", post.getStringTitle());
 
 			// カテゴリ情報追加 TODO DBではなくキャッシュしたい
 			if(dsPost.getCategoryId() != null){
-				CategoryClass category = categoryRepo.findOne(dsPost.getCategoryId());
-				model.addAttribute("category", category);
-			}else{
-				CategoryClass category = new CategoryClass();
-				category.setName("News");
-				model.addAttribute("category", category);
+				category = categoryRepo.findOne(dsPost.getCategoryId());
 			}
 		}
 
+		if(category == null){
+			category = new CategoryClass();
+			category.setName("News");
+		}
 
+		keywords = category.getName() + ","  + post.getKeywords();
+
+		model.addAttribute("category", category);
+		model.addAttribute("keywords", keywords);
 		model.addAttribute("page", intPage);
 		model.addAttribute("post", post);
 		return "post";
 	}
 
-	@RequestMapping("post-add")
-	String add(PostClass post) {
+	@RequestMapping("admin/post-update")
+	String postUpdate(@Param("id") Long id, @Param("status") Integer status) {
+
+		PostClass dsPost = postRepo.findOne(id);
+		if(dsPost == null){
+			return "redirect:/post-list";
+		}
+		PostClass post = new PostClass();
+		BeanUtils.copyProperties(dsPost, post);
+		post.setStatus(status);
 		postRepo.save(post);
 		return "redirect:/post-list";
 	}
 
 	/**  target */
+	@RequestMapping("admin/target-add")
+	String addtarget(@Param("id") Long id, @Param("status") Integer status) {
+
+		if( status == null || status < 0){
+			return "target-list";
+		}
+
+		TargetClass target = targetRepo.findOne(id);
+
+		TargetClass saveObj = new TargetClass();
+		BeanUtils.copyProperties(target, saveObj);
+		saveObj.setStatus(status);
+		targetRepo.save(saveObj);
+		return "target-list";
+	}
+
 	@RequestMapping("admin/target-list")
 	String targetList(Model model) {
 		return targetList(0, 0, model);
@@ -256,20 +295,42 @@ public class NewsController {
 		model.addAttribute("targetList", targetList);
 		model.addAttribute("page", page);
 		model.addAttribute("status", status);
+		model.addAttribute("count", targetList.getTotalElements());
 		return "target-list";
+	}
+
+	@RequestMapping("admin/post-list")
+	String adminPostList( Model model ) {
+		return adminPostList(0, model);
+	}
+
+	@RequestMapping("admin/post-list/{page}")
+	String adminPostList(@PathVariable("page") Integer page, Model model) {
+
+		if(page  < 0){
+			page = 0;
+		}
+
+		Pageable pageable = new PageRequest(page, 20 , Direction.DESC , "date");
+		Page<PostClass> postList = postRepo.findAll(pageable);
+		model.addAttribute("isAdmin", "true");
+		model.addAttribute("postList", postList);
+		model.addAttribute("page", page);
+		model.addAttribute("title", "news" + page);
+		return "post-list";
 	}
 
 	/** cron job */
 	@RequestMapping("cron/rss-read")
 	String rssRead() {
-		LOGGER.info("STAR RssRead");
+		log.info("STAR RssRead");
 		List<CategoryClass> categoryList = categoryRepo.findAll();
 		for (CategoryClass category : categoryList) {
 			List<TargetClass> targetList = RssReader.readRss(category);
 			for (TargetClass target : targetList) {
 				TargetClass ret = targetRepo.findByUrl(target.getUrl());
 				if (ret != null) {
-					LOGGER.info("continue " + ret.getTitle());
+					log.info("continue " + ret.getTitle());
 					continue;
 				}
 				target.setCategoryId(category.getId());
@@ -278,7 +339,7 @@ public class NewsController {
 				targetRepo.save(target);
 			}
 		}
-		LOGGER.info("END RssRead");
+		log.info("END RssRead");
 		return "index";
 	}
 
@@ -286,45 +347,39 @@ public class NewsController {
 	@RequestMapping("cron/post-maker")
 	String postMaker() {
 		long start = System.currentTimeMillis();
-		LOGGER.info("STAR postMaker");
+		log.info("STAR postMaker");
+		List<ParserClass> parsers = parserRepo.findByStatus(1);
+
+
 //		MemcacheService syncCache = MemcacheServiceFactory.getMemcacheService();
-//		syncCache.setErrorHandler(ErrorHandlers
-//				.getConsistentLogAndContinue(Level.INFO));
+//		syncCache.setErrorHandler(ErrorHandlers.getConsistentLogAndContinue(Level.INFO));
 //		@SuppressWarnings("unchecked")
 //		List<ParserClass> parsers = (List<ParserClass>) syncCache.get(Parser.MemcacheServiceKey);
 //		Date cacheTime = (Date) syncCache.get(Parser.MemcacheServiceTimeKey);
-//		System.out.println("cacheTime : "+cacheTime);
-//		if (parsers == null || cacheTime == null || cacheTime.after(new Date())) {
-//			List<ParserClass> parserList = parserRepo.findAll();
+//		if (parsers == null ) {
+//			parsers = parserRepo.findByStatus(1);
 //			Calendar  cal = Calendar.getInstance();
 //			cal.add(Calendar.MINUTE, 90);
-//
-//			System.out.println("new cacheTime : "+ cal.getTime());
-//			syncCache.put(Parser.MemcacheServiceKey, parserList); // Populate
+//			syncCache.put(Parser.MemcacheServiceKey, parsers); // Populate
 //			syncCache.put(Parser.MemcacheServiceTimeKey, cal.getTime());
 //		}
-
-		List<ParserClass> parserList = parserRepo.findByStatus(1);
-
-		System.out.println("parserList size : " +parserList.size());
 
 		int count = 0;
 		List<TargetClass> targetList = targetRepo.findByStatus(1);
 		for (TargetClass target : targetList) {
 			count++;
 //			if(count > 3){
-			if( start + TWENTY_SECOND < System.currentTimeMillis()  ){
+			if( start + RUN_TIME < System.currentTimeMillis()  ){
 				break;
 			}
 
-			System.out.println("targetList size : " +targetList.size());
 
 			ParserClass parser = null;
 			if(target.getUrl() == null){
 				targetRepo.delete(target.getId());
 				continue;
 			}
-			for (ParserClass dbParser : parserList) {
+			for (ParserClass dbParser : parsers) {
 				if(target.getUrl().contains(dbParser.getKey())){
 					parser = dbParser;
 				}
@@ -339,13 +394,22 @@ public class NewsController {
 				targetRepo.save(newTarget);
 				continue;
 			}
-			System.out.println("parser : " +parser.getKey());
-			System.out.println("target : " +target.getUrl());
+
+			if (parser.getNewsLinkTag() != null && !parser.getNewsLinkTag().isEmpty()) {
+				TargetClass saveObj = Parser.parsing(target, parser);
+				targetRepo.save(saveObj);
+
+				TargetClass newTarget = new TargetClass();
+				BeanUtils.copyProperties(target, newTarget);
+				newTarget.setStatus(4);
+				targetRepo.save(newTarget);
 
 
-			TargetClass saveObj = Parser.parsing(target, parser);
-			System.out.println("ret Target: " +saveObj.getUrl());
-			targetRepo.save(saveObj);
+			}else{
+				TargetClass saveObj = Parser.parsing(target, parser);
+				targetRepo.save(saveObj);
+			}
+
 
 			// TODO 後処理。。。悩み中
 //			switch (parser.getClosing()) {
@@ -359,11 +423,11 @@ public class NewsController {
 //			default:
 //				break;
 //			}
-			if( start + TWENTY_SECOND < System.currentTimeMillis()  ){
+			if( start + RUN_TIME < System.currentTimeMillis()  ){
 				break;
 			}
 		}
-		LOGGER.info("END postMaker : " + count);
+		log.info("END postMaker : " + count);
 		return "index";
 	}
 
@@ -372,44 +436,63 @@ public class NewsController {
 	@RequestMapping("cron/trans")
 	String trans() {
 		long start = System.currentTimeMillis();
-		LOGGER.info("STAR trans ");
+		System.out.println("STAR trans ");
 
 		int count = 0;
+		int error = 0;
 		List<TargetClass> targetList = targetRepo.findByStatus(2);
+
+		System.out.println("targetList size : "+ targetList.size());
 
 		for (TargetClass target : targetList) {
 			count++;
-			if( start + TWENTY_SECOND < System.currentTimeMillis()  ){
+			if( start + RUN_TIME < System.currentTimeMillis()  ){
 				break;
 			}
-			System.out.println("targetList size : " +targetList.size());
 
-			// 重複除去
-			List<PostClass> list = postRepo.findByUrl(target.getUrl());
-			if(list.size() < 1){
-				try {
-					PostClass post = TranslationUtil.trans(target);
+			if(target.getTitle() == null || target.getTitle().trim().length() < 1 || target.getBody() == null || target.getStringBody().trim().length() < 1){
+				// データ不足
+				error++;
+				TargetClass saveObj = new TargetClass();
+				BeanUtils.copyProperties(target, saveObj);
+				saveObj.setStatus(4);
+				targetRepo.save(saveObj);
 
-					postRepo.save(post);
-				} catch (Exception e) {
-					e.printStackTrace();
-					continue;
+			}else{
+
+				// 重複除去
+				List<PostClass> list = postRepo.findByUrl(target.getUrl());
+				if(list.size() < 1){
+					try {
+						PostClass post = TranslationUtil.trans(target);
+						postRepo.save(post);
+					} catch (Exception e) {
+
+						// 通訳失敗
+						error++;
+						TargetClass saveObj = new TargetClass();
+						BeanUtils.copyProperties(target, saveObj);
+						saveObj.setStatus(4);
+						targetRepo.save(saveObj);
+
+						continue;
+					}
 				}
 			}
 
 
-			// 一致するparserが無い
+			// postに登録完了。
 			TargetClass saveObj = new TargetClass();
 			BeanUtils.copyProperties(target, saveObj);
 			saveObj.setStatus(3);
 			targetRepo.save(saveObj);
 
-			if( start + TWENTY_SECOND < System.currentTimeMillis()  ){
+			if( start + RUN_TIME < System.currentTimeMillis()  ){
 				break;
 			}
 		}
-
-		LOGGER.info("END trans : "+count);
+		System.out.println("trans error: "+error);
+		System.out.println("END trans : "+count);
 		return "index";
 	}
 }

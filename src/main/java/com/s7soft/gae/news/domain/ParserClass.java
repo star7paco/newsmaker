@@ -1,7 +1,8 @@
 package com.s7soft.gae.news.domain;
 
-import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -13,10 +14,11 @@ import com.s7soft.gae.news.util.HtmlUtil;
 
 @Entity
 @Component
-public class ParserClass implements Serializable{
+public class ParserClass{
 
-	public static ParserClass[] getDefault(){
-		ParserClass[] parsers = new ParserClass[4];
+	public static List<ParserClass> getDefault(){
+
+		List<ParserClass> parsers = new ArrayList<ParserClass>();
 		ParserClass parser0 = new ParserClass();
 		parser0.key = "news.yahoo.co.jp/pickup";
 		parser0.name = "yahoo next page";
@@ -50,12 +52,31 @@ public class ParserClass implements Serializable{
 		parser3.status = 1;
 		parser3.setDate(new Date());
 
+		ParserClass parser4 = new ParserClass();
+		parser4.key = "rdsig.yahoo.co.jp";
+		parser4.name = "carview";
+		parser4.titleTag = "hd";
+		parser4.bodyTag = "ynDetailText";
+		parser4.status = 1;
+		parser4.setDate(new Date());
 
 
-		parsers[0] = parser0;
-		parsers[1] = parser1;
-		parsers[2] = parser2;
-		parsers[3] = parser3;
+		ParserClass parser5 = new ParserClass();
+		parser5.key = "juggly.cn";
+		parser5.name = "juggly.cn";
+		parser5.startTitle = HtmlUtil.convertSanitize("<h2>");
+		parser5.endTitle = HtmlUtil.convertSanitize("</h2>");
+		parser5.startBody = HtmlUtil.convertSanitize("<p>");
+		parser5.endBody = HtmlUtil.convertSanitize("</p>");
+		parser5.status = 1;
+		parser5.setDate(new Date());
+
+		parsers.add(parser0);
+		parsers.add(parser1);
+		parsers.add(parser2);
+		parsers.add(parser3);
+		parsers.add(parser4);
+		parsers.add(parser5);
 		return parsers;
 	}
 

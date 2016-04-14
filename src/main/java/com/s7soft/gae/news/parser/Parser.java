@@ -9,6 +9,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Node;
 import org.jsoup.select.Elements;
+import org.springframework.beans.BeanUtils;
 
 import com.s7soft.gae.news.domain.ParserClass;
 import com.s7soft.gae.news.domain.TargetClass;
@@ -25,14 +26,7 @@ public class Parser {
 
 	public static TargetClass parsing(TargetClass input, ParserClass parser) {
 		TargetClass target = new TargetClass();
-		target.setId(input.getId());
-		target.setBody(input.getBody());
-		target.setCategoryId(input.getCategoryId());
-		target.setDate(input.getDate());
-		target.setImgurl(input.getImgurl());
-		target.setStatus(input.getStatus());
-		target.setTitle(input.getTitle());
-		target.setUrl(input.getUrl());
+		BeanUtils.copyProperties(input, target);
 
 		if (parser.getNewsLinkTag() != null
 				&& !parser.getNewsLinkTag().isEmpty()) {
@@ -46,6 +40,27 @@ public class Parser {
 		}
 		return getNews(target, parser);
 
+	}
+
+
+	public static TargetClass newsLinkChange(TargetClass input, ParserClass parser) {
+		TargetClass target = new TargetClass();
+		target.setBody(input.getBody());
+		target.setCategoryId(input.getCategoryId());
+		target.setDate(input.getDate());
+		target.setImgurl(input.getImgurl());
+		target.setStatus(input.getStatus());
+		target.setTitle(input.getTitle());
+		target.setUrl(input.getUrl());
+
+		String imgurl = getImage(target);
+
+		target.setUrl(newsLinkChange(target, parser.getNewsLinkTag()));
+		target.setStatus(1);
+
+		target.addImgurl(imgurl);
+
+		return target;
 	}
 
 	private static TargetClass getNews(TargetClass target, ParserClass parser) {
@@ -79,7 +94,7 @@ public class Parser {
 		try {
 			Document doc = Jsoup.connect(target.getUrl()).userAgent("Mozilla/5.0 (Windows NT 6.1; WOW64; rv:5.0) Gecko/20100101 Firefox/5.0").get();
 			String keywords = doc.select("meta[name=keywords]").first().attr("content");
-			System.out.println(keywords);
+			target.setKeywords(keywords);
 
 			String html = doc.getAllElements().html();
 
@@ -93,8 +108,19 @@ public class Parser {
 			Matcher m = p.matcher(html);
 			if (m.find()) {
 				String src = m.group(2);//ここにURLが入る
-				System.out.println(src);
-				target.addVideourl(src);
+				if( !src.contains("www.facebook.com") ){
+					System.out.println(src);
+					target.addVideourl(src);
+				}
+			}
+
+
+			// 画像のlinkを取得
+			Pattern imgP = Pattern.compile("<\\s*img.*src\\s*=\\s*([\\\"'])?([^ \\\"']*)[^>]*>");
+			Matcher imgM = imgP.matcher(getHtml(html, parser.getStartBody(), parser.getEndBody()));
+			if (imgM.find()) {
+				String src = imgM.group(2);//ここにURLが入る
+				target.addImgurl(src);
 			}
 
 
@@ -116,6 +142,9 @@ public class Parser {
 	private static TargetClass getNewsByClassName(TargetClass target, ParserClass parser) {
 		try {
 			Document doc = Jsoup.connect(target.getUrl()).userAgent("Mozilla/5.0 (Windows NT 6.1; WOW64; rv:5.0) Gecko/20100101 Firefox/5.0").get();
+
+			String keywords = doc.select("meta[name=keywords]").first().attr("content");
+			target.setKeywords(keywords);
 
 			String title = target.getTitle();
 			String body = "";
@@ -202,6 +231,21 @@ public class Parser {
 		int end = start + txt.substring(start).indexOf(endKey);
 
 		return txt.substring(start, end).replaceAll("<.+?>", "");
+	}
+
+	public static String getHtml(String txt ,String startKey, String endKey) {
+
+		if(txt == null || txt.isEmpty() ){
+			return "";
+		}
+
+		startKey = HtmlUtil.convertUnsanitize(startKey);
+		endKey = HtmlUtil.convertUnsanitize(endKey);
+
+		int start = txt.indexOf(startKey) + startKey.length();
+		int end = start + txt.substring(start).indexOf(endKey);
+
+		return txt.substring(start, end);
 	}
 
 }

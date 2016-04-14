@@ -45,7 +45,7 @@ public class HtmlUtil {
         if(str==null) {
             return str;
         }
-        return str.replaceAll("<.+?>", "");
+        return str.replaceAll("<.+?>", "").replaceAll("\n", "");
      }
 
 }

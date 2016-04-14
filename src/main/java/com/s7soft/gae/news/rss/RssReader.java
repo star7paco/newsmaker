@@ -8,8 +8,6 @@ import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -73,34 +71,9 @@ public class RssReader {
 				NodeList item_title = element.getElementsByTagName("title");
 				NodeList item_link = element.getElementsByTagName("link");
 
-				NodeList item_description = null;
-				try{
-					item_description = element.getElementsByTagName("description");
-				}catch(Exception e) {
-				}
-
 				String title = item_title.item(0).getFirstChild()
 						.getNodeValue();
 				String link = item_link.item(0).getFirstChild().getNodeValue();
-
-				try{
-					if(item_description != null){
-						String description = item_description.item(0).getFirstChild().getNodeValue();
-
-
-						Pattern p = Pattern.compile("<\\s*img.*src\\s*=\\s*([\\\"'])?([^ \\\"']*)[^>]*>");
-						Matcher m = p.matcher(description);
-						if (m.find()) {
-							String src = m.group(2);//ここにURLが入る
-							System.out.println(src);
-							target.addImgurl(src);
-						}
-
-
-
-					}
-				}catch(Exception e) {
-				}
 
 				target.setTitle(title);
 				target.setUrl(link);

@@ -1,12 +1,8 @@
 <%@ page contentType="text/html; charset=UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <title>POST-InsertTitleMessage</title>
-<h3>Target 리스트</h3>
+<h3>Target 리스트 (${count}) </h3>
 <c:set var="pageUrl" value="/admin/target-list/" />
-
-<c:forEach var="target" items="${targetList.content}">
- url : ${target.url} ,  title : ${target.title} , status : ${target.status} ,  body : ${target.stringBody} <br>
-</c:forEach>
 
 
 <form action="${pageUrl}${page}" >
@@ -16,15 +12,41 @@
 <input type="submit">
 </form>
 
+<table border="1">
+<c:forEach var="target" items="${targetList.content}">
+<tr>
+  <td colspan="2">${target.id}</td>
+</tr>
+<tr>
+  <td>status</td>
+  <td>
+   <form action="/admin/target-add" >
+   <input type="hidden" name="id" value="${target.id}">
+   <input type="text" name="status" value="${target.status}">
+   <input type="submit">
+   </form>
+  </td>
+</tr>
+<tr>
+  <td>url</td><td>${target.url}</td>
+</tr>
+<tr>
+  <td>date</td><td>${target.dateTime}</td>
+</tr>
+<tr>
+  <td>title</td><td>${target.title}</td>
+</tr>
+<tr>
+  <td>body</td><td>${target.stringBody}</td>
+</tr>
+</c:forEach>
+</table>
 
-<ul class="pager">
-    <li class="previous">
-        <a href="${pageUrl}${page-1}">&larr; Newer Posts</a>
-    </li>
-    <li class="next">
-        <a href="${pageUrl}${page+1}">Older Posts &rarr;</a>
-    </li>
-</ul>
+
+
+
+
+
 <nav>
  <ul class="pager">
   <c:choose>

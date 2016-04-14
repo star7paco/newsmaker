@@ -4,6 +4,16 @@
 <div class="container">
 <%= AdSense.AutoTop %>
 
+  <c:choose>
+   <c:when test="${isAdmin != null}">
+     <c:set var="pageUrl" value="/admin/post-list/" />
+    </c:when>
+   <c:otherwise>
+     <c:set var="pageUrl" value="/post-list/" />
+    </c:otherwise>
+  </c:choose>
+
+
 <hr>
 <div class="bs-example">
 <c:forEach var="post" items="${postList.content}">
@@ -30,10 +40,10 @@
    <c:when test="${page == 0}">
     <li class="previous disabled"><a href="#"><span aria-hidden="true">&larr;</span>Newer</a></li></c:when>
    <c:otherwise>
-    <li class="previous"><a href="/post-list/${page-1}"><span aria-hidden="true">&larr;</span>Newer</a></li></c:otherwise>
+    <li class="previous"><a href="${pageUrl}${page-1}"><span aria-hidden="true">&larr;</span>Newer</a></li></c:otherwise>
   </c:choose>
   <li class="page-no"> ${page}</li>
-  <li class="next"><a href="/post-list/${page+1}">Older<span aria-hidden="true">&rarr;</span></a></li>
+  <li class="next"><a href="${pageUrl}${page+1}">Older<span aria-hidden="true">&rarr;</span></a></li>
  </ul>
 </nav>
 

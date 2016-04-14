@@ -1,5 +1,6 @@
 package com.s7soft.gae.news.domain;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import javax.persistence.Entity;
@@ -13,7 +14,9 @@ import com.s7soft.gae.news.util.TimeUtil;
 
 @Entity
 @Component
-public class PostClass {
+public class PostClass implements Serializable{
+
+	private static final long serialVersionUID = 1L;
 
 	@Id
 	@GeneratedValue
@@ -23,6 +26,8 @@ public class PostClass {
 	private String url;
 	private String title;
 	private Text body;
+	private String keywords;
+	private String originalKeywords;
 
 	private String originalTitle;
 	private Text originalBody;
@@ -211,6 +216,22 @@ public class PostClass {
 
 	public void setVideourl(String videourl) {
 		this.videourl = videourl;
+	}
+
+	public String getKeywords() {
+		return keywords;
+	}
+
+	public void setKeywords(String keywords) {
+		this.keywords = keywords;
+	}
+
+	public String getOriginalKeywords() {
+		return originalKeywords;
+	}
+
+	public void setOriginalKeywords(String originalKeywords) {
+		this.originalKeywords = originalKeywords;
 	}
 
 

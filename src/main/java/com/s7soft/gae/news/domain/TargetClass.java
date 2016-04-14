@@ -9,6 +9,7 @@ import javax.persistence.Id;
 import org.springframework.stereotype.Component;
 
 import com.google.appengine.api.datastore.Text;
+import com.s7soft.gae.news.util.TimeUtil;
 
 @Entity
 @Component
@@ -22,6 +23,7 @@ public class TargetClass{
 	private Long categoryId;
 
 	private String url;
+	private String keywords;
 	private String title;
 
 	private String imgurl;
@@ -31,6 +33,10 @@ public class TargetClass{
 	private Date date;
 	private int status;
 
+	public TargetClass() {
+
+	}
+
 	public Date getDate() {
 		return date;
 	}
@@ -39,17 +45,16 @@ public class TargetClass{
 		this.date = date;
 	}
 
+	public String getDateTime() {
+		return TimeUtil.format(date);
+	}
+
 	public int getStatus() {
 		return status;
 	}
 
 	public void setStatus(int status) {
 		this.status = status;
-	}
-
-
-	public TargetClass() {
-
 	}
 
 	public Long getId() {
@@ -138,6 +143,14 @@ public class TargetClass{
 		}else{
 			setVideourl(videourl);
 		}
+	}
+
+	public String getKeywords() {
+		return keywords;
+	}
+
+	public void setKeywords(String keywords) {
+		this.keywords = keywords;
 	}
 
 

@@ -24,6 +24,12 @@ if( AdminUtil.isAdminUser() ){
  <div class="panel-heading"><h1>${post.originalTitle}</h1></div>
   <div class="panel-body">
     <p>${post.stringOriginalBody}</p>
+    <br>
+    <form action="/admin/post-update" >
+     <input type="hidden" name="id" value="${post.id}">
+     status:<input type="text" name="status" value="${post.status}">
+     <input type="submit">
+    </form>
   </div>
 </div>
 

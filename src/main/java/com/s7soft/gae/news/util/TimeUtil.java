@@ -13,6 +13,7 @@ public class TimeUtil {
 	}
 
 	public static String format(Date date) {
+		if(date == null){return"";} // null対応
 		return sdf.format(date);
 	}
 }

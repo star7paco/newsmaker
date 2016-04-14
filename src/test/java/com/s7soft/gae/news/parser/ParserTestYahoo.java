@@ -5,6 +5,8 @@ import static org.assertj.core.api.Assertions.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.Test;
+
 import com.s7soft.gae.news.domain.CategoryClass;
 import com.s7soft.gae.news.domain.ParserClass;
 import com.s7soft.gae.news.domain.TargetClass;
@@ -56,7 +58,7 @@ public class ParserTestYahoo {
 
 	}
 
-//	@Test
+	@Test
 	public void rssAndParsing(){
 
 		List<TargetClass> retList = new ArrayList<TargetClass>();
@@ -84,6 +86,7 @@ public class ParserTestYahoo {
 				}
 				TargetClass ret = Parser.parsing(target, parser);
 				System.out.println(ret.getTitle());
+				System.out.println(ret.getKeywords());
 				System.out.println(ret.getStringBody());
 			}
 		}

@@ -24,6 +24,7 @@ public class TranslationUtil {
 
 	private static final Logger log = Logger.getLogger(TranslationUtil.class.getName());
 
+
 	public static List<String> keylist;
 
 	static {
@@ -91,33 +92,77 @@ public class TranslationUtil {
 		post.setCategoryId(target.getCategoryId());
 		post.setOriginalTitle(target.getTitle());
 		post.setOriginalBody(target.getBody());
+		post.setOriginalKeywords(target.getKeywords());
 		post.setUrl(target.getUrl());
 		post.setDate(target.getDate());
 
 		post.setClickCount(0);
 		post.setStatus(1);
 
-
+		Thread.sleep(100);
 
 		String title = getChangeHtml(target.getTitle());
-		String body = getChangeHtml(target.getStringBody());
+		String body = transBody(target.getStringBody());
+		String keywords = getChangeHtml(target.getKeywords());
+
+
 
 		title = title.replaceAll("<.+?>", "");
 
 		if(title == null || title.trim().length() < 1 || body == null || body.trim().length() < 1){
-			System.out.println(target.getTitle());
+//			System.out.println("error trans");
+//			System.out.println( "org title : " +  target.getTitle());
+//			System.out.println( "trens title : " +  title);
+//			System.out.println( "org body : " +  target.getStringBody());
+//			System.out.println( "trens body : " +  body );
 			throw new Exception("error trans");
 		}
 
 		post.setTitle( title );
 		post.setBody( new Text(body) );
-
-
+		post.setKeywords(keywords);
 
 		return post;
 	}
 
+	public static String transBody(String textjp) throws Exception {
 
+		String bodyParts[] = textjp.split("。");
+		String body = "";
+		String ret = "";
+
+		if(bodyParts.length < 1){
+			Thread.sleep(100);
+			return getChangeHtml(textjp);
+		}else{
+
+
+			for (String string : bodyParts) {
+				body += string + "。";
+
+				if( body.length() > 500 ){
+					Thread.sleep(100);
+					String krBody = getChangeHtml(body);
+					ret += krBody;
+					body = "";
+				}
+
+			}
+
+			if( body.length() > 1 ){
+
+				String krBody = getChangeHtml(body);
+				ret += krBody;
+			}
+
+
+			return ret;
+
+
+		}
+
+
+	}
 	/**
 	 * <pre>
 	 * 변역기
@@ -138,7 +183,7 @@ public class TranslationUtil {
 
 
 		log.log(Level.FINEST, "START getChangeHtml" );
-		if (textjp == null || textjp.trim().length() == 0) {
+		if (textjp == null || textjp.trim().length() < 1) {
 			return "";
 		}
 
@@ -248,6 +293,7 @@ public class TranslationUtil {
 		for (int i = 0; i < tegs.length; i++) {
 			textkr = textkr.replace("[stringteg" + i + "]", tegs[i]);
 		}
+		textkr = textkr.replaceAll("\n", "");
 //		if(textkr.indexOf("</textarea>") >= 0){
 //			textkr = getChangeHtml(textjp);
 //		}
@@ -275,7 +321,7 @@ public class TranslationUtil {
 
 
 		log.log(Level.FINEST, "START getChangeHtml" );
-		if (textjp == null || textjp.trim().length() == 0) {
+		if (textjp == null || textjp.trim().length() < 1) {
 			return "";
 		}
 
@@ -383,6 +429,8 @@ public class TranslationUtil {
 		for (int i = 0; i < tegs.length; i++) {
 			textkr = textkr.replace("[stringteg" + i + "]", tegs[i]);
 		}
+
+		textkr = textkr.replaceAll("\n", "");
 //		if(textkr.indexOf("</textarea>") >= 0){
 //			textkr = getChangeHtml(textjp);
 //		}
