@@ -4,4 +4,8 @@
         <property name="status" direction="asc"/>
         <property name="date" direction="desc"/>
     </datastore-index>
+    <datastore-index kind="TargetClass" ancestor="false" source="manual">
+        <property name="status" direction="asc"/>
+        <property name="date" direction="desc"/>
+    </datastore-index>
 </datastore-indexes>

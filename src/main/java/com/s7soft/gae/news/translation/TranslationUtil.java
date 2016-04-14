@@ -10,7 +10,6 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
@@ -93,10 +92,11 @@ public class TranslationUtil {
 		post.setOriginalTitle(target.getTitle());
 		post.setOriginalBody(target.getBody());
 		post.setUrl(target.getUrl());
+		post.setDate(target.getDate());
 
 		post.setClickCount(0);
 		post.setStatus(1);
-		post.setDate(new Date());
+
 
 
 		String title = getChangeHtml(target.getTitle());

@@ -11,6 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -238,20 +239,28 @@ public class NewsController {
 	/**  target */
 	@RequestMapping("admin/target-list")
 	String targetList(Model model) {
-		return targetList(0, model);
+		return targetList(0, 0, model);
 	}
 
 	/**  target */
 	@RequestMapping("admin/target-list/{Id}")
-	String targetList(@PathVariable("Id") Integer page, Model model) {
-		List<TargetClass> targetList = targetRepo.findAll();
+	String targetList(@PathVariable("Id") Integer page, @Param("status") Integer status, Model model) {
+		if(page  < 0){
+			page = 0;
+		}
+		if(status == null){
+			status = 0;
+		}
+		Pageable pageable = new PageRequest(page, 12 , Direction.DESC , "date");
+		Page<TargetClass> targetList = targetRepo.findByStatus(status, pageable);
 		model.addAttribute("targetList", targetList);
 		model.addAttribute("page", page);
+		model.addAttribute("status", status);
 		return "target-list";
 	}
 
 	/** cron job */
-	@RequestMapping("rss-read")
+	@RequestMapping("cron/rss-read")
 	String rssRead() {
 		LOGGER.info("STAR RssRead");
 		List<CategoryClass> categoryList = categoryRepo.findAll();
@@ -274,9 +283,9 @@ public class NewsController {
 	}
 
 	/** cron job */
-	@RequestMapping("post-maker")
+	@RequestMapping("cron/post-maker")
 	String postMaker() {
-//		long start = System.currentTimeMillis();
+		long start = System.currentTimeMillis();
 		LOGGER.info("STAR postMaker");
 //		MemcacheService syncCache = MemcacheServiceFactory.getMemcacheService();
 //		syncCache.setErrorHandler(ErrorHandlers
@@ -302,7 +311,11 @@ public class NewsController {
 		int count = 0;
 		List<TargetClass> targetList = targetRepo.findByStatus(1);
 		for (TargetClass target : targetList) {
-
+			count++;
+//			if(count > 3){
+			if( start + TWENTY_SECOND < System.currentTimeMillis()  ){
+				break;
+			}
 
 			System.out.println("targetList size : " +targetList.size());
 
@@ -329,7 +342,7 @@ public class NewsController {
 			System.out.println("parser : " +parser.getKey());
 			System.out.println("target : " +target.getUrl());
 
-			count++;
+
 			TargetClass saveObj = Parser.parsing(target, parser);
 			System.out.println("ret Target: " +saveObj.getUrl());
 			targetRepo.save(saveObj);
@@ -346,31 +359,33 @@ public class NewsController {
 //			default:
 //				break;
 //			}
-			if(count > 5){
-//			if( start + TWENTY_SECOND < System.currentTimeMillis()  ){
+			if( start + TWENTY_SECOND < System.currentTimeMillis()  ){
 				break;
 			}
-
 		}
-		LOGGER.info("END postMaker");
+		LOGGER.info("END postMaker : " + count);
 		return "index";
 	}
 
 
 	/** cron job */
-	@RequestMapping("trans")
+	@RequestMapping("cron/trans")
 	String trans() {
-//		long start = System.currentTimeMillis();
+		long start = System.currentTimeMillis();
 		LOGGER.info("STAR trans ");
 
 		int count = 0;
 		List<TargetClass> targetList = targetRepo.findByStatus(2);
 
 		for (TargetClass target : targetList) {
+			count++;
+			if( start + TWENTY_SECOND < System.currentTimeMillis()  ){
+				break;
+			}
 			System.out.println("targetList size : " +targetList.size());
 
 			// 重複除去
-			List<PostClass> list =postRepo.findByUrl(target.getUrl());
+			List<PostClass> list = postRepo.findByUrl(target.getUrl());
 			if(list.size() < 1){
 				try {
 					PostClass post = TranslationUtil.trans(target);
@@ -388,16 +403,13 @@ public class NewsController {
 			BeanUtils.copyProperties(target, saveObj);
 			saveObj.setStatus(3);
 			targetRepo.save(saveObj);
-			count++;
 
-
-			if(count > 5){
-//			if( start + TWENTY_SECOND < System.currentTimeMillis()  ){
+			if( start + TWENTY_SECOND < System.currentTimeMillis()  ){
 				break;
 			}
 		}
 
-		LOGGER.info("END trans");
+		LOGGER.info("END trans : "+count);
 		return "index";
 	}
 }

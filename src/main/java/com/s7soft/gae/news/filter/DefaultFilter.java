@@ -29,12 +29,11 @@ public class DefaultFilter implements Filter {
 		URL url = new URL(((HttpServletRequest)req).getRequestURL().toString());
 	    String host  = url.getHost();
 
-	    if(!host.contains("localhost") && !host.contains("news.s7soft.com")){
+	    // cron skip
+	    if(!url.getFile().contains("cron") && !host.contains("localhost") && !host.contains("news.s7soft.com")){
 	    	((HttpServletResponse)res).sendRedirect("http://news.s7soft.com"+url.getFile());
 	    	return;
 	    }
-
-
 		chain.doFilter(req, res);
 	}
 

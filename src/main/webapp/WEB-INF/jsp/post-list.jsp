@@ -3,7 +3,6 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <div class="container">
 <%= AdSense.AutoTop %>
-<%=session.getAttribute("page")%>
 
 <hr>
 <div class="bs-example">
@@ -17,7 +16,7 @@
   <div class="media-body">
    <a href="/post/${post.id}">
     <h4 class="media-heading">${post.stringTitle}</h4>
-    <%=session.getAttribute("page")%> ${post.dateTime} <span class="badge">${post.clickCount}</span>
+    ${post.dateTime} <span class="badge">${post.clickCount}</span>
     </a>
   </div>
 </div>
