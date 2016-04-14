@@ -401,6 +401,7 @@ public class NewsController {
 
 				TargetClass newTarget = new TargetClass();
 				BeanUtils.copyProperties(target, newTarget);
+				newTarget.setId(null); // urlチェック用に旧URLを作成
 				newTarget.setStatus(4);
 				targetRepo.save(newTarget);
 

@@ -115,12 +115,18 @@ public class Parser {
 			}
 
 
-			// 画像のlinkを取得
+			// 画像のlinkを取得 + 動画の場合は動画を追加する。
 			Pattern imgP = Pattern.compile("<\\s*img.*src\\s*=\\s*([\\\"'])?([^ \\\"']*)[^>]*>");
 			Matcher imgM = imgP.matcher(getHtml(html, parser.getStartBody(), parser.getEndBody()));
 			if (imgM.find()) {
 				String src = imgM.group(2);//ここにURLが入る
-				target.addImgurl(src);
+				if( src.contains("//www.youtube") ){
+					System.out.println(src);
+					target.addVideourl(src);
+				}else{
+					target.addImgurl(src);
+				}
+
 			}
 
 
