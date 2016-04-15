@@ -11,19 +11,7 @@
 <meta charset="UTF-8" />
 <meta name="description" content="${title}">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-
-
-
-  <c:choose>
-   <c:when test="${keywords != null}">
-     <meta name="keywords" content="일본,뉴스,${keywords}">
-    </c:when>
-   <c:otherwise>
-     <meta name="keywords" content="일본,뉴스">
-    </c:otherwise>
-  </c:choose>
-
-
+<meta name="keywords" content="${keywords}">
 <script>
   (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
   (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -66,6 +54,8 @@ if (UserServiceFactory.getUserService().getCurrentUser() != null) { %>
 
     </ul>
   </nav>
+
+
   <h3 class="text-muted"><a href="/">일본 뉴스</a></h3>
 </div>
 

@@ -23,6 +23,7 @@ public class PostClass implements Serializable{
 	private Long id;
 
 	private Long categoryId;
+	private String categoryName;
 	private String url;
 	private String title;
 	private Text body;
@@ -232,6 +233,14 @@ public class PostClass implements Serializable{
 
 	public void setOriginalKeywords(String originalKeywords) {
 		this.originalKeywords = originalKeywords;
+	}
+
+	public String getCategoryName() {
+		return categoryName;
+	}
+
+	public void setCategoryName(String categoryName) {
+		this.categoryName = categoryName;
 	}
 
 

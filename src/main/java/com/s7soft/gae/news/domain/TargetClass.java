@@ -1,5 +1,6 @@
 package com.s7soft.gae.news.domain;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import javax.persistence.Entity;
@@ -13,7 +14,9 @@ import com.s7soft.gae.news.util.TimeUtil;
 
 @Entity
 @Component
-public class TargetClass{
+public class TargetClass implements Serializable{
+
+	private static final long serialVersionUID = 1L;
 
 	// TODO ステータスの定義作成。
 	@Id

@@ -93,8 +93,13 @@ public class Parser {
 	private static TargetClass getNewsByToEnd(TargetClass target, ParserClass parser) {
 		try {
 			Document doc = Jsoup.connect(target.getUrl()).userAgent("Mozilla/5.0 (Windows NT 6.1; WOW64; rv:5.0) Gecko/20100101 Firefox/5.0").get();
-			String keywords = doc.select("meta[name=keywords]").first().attr("content");
-			target.setKeywords(keywords);
+
+			try {
+				String keywords = doc.select("meta[name=keywords]").first().attr("content");
+				target.setKeywords(keywords);
+			} catch (Exception e) {
+			}
+
 
 			String html = doc.getAllElements().html();
 
@@ -140,6 +145,7 @@ public class Parser {
 			}
 
 		} catch (IOException e) {
+			System.out.println(target.getUrl());
 			e.printStackTrace();
 		}
 		return target;

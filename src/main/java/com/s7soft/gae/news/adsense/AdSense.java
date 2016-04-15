@@ -55,20 +55,55 @@ public class AdSense {
 		+"";
 
 
-	public static final String AutoTop = ""+
+
+
+	public static final String PostTop = ""+
 	"<script async src=\"//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js\"></script>"+
 	"<!-- auto_top -->"+
 	"<ins class=\"adsbygoogle\""+
 	     "style=\"display:block\""+
 	     "data-ad-client=\"ca-pub-7534285248466198\""+
-	     "data-ad-slot=\"4256713205\""+
+	     "data-ad-slot=\"2619066006\""+
 	     "data-ad-format=\"auto\"></ins>"+
 	"<script>"+
 	"(adsbygoogle = window.adsbygoogle || []).push({});"+
 	"</script>";
 
+	public static final String PostEnd = ""+
+	"<script async src=\"//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js\"></script>"+
+	"<!-- auto_top -->"+
+	"<ins class=\"adsbygoogle\""+
+	     "style=\"display:block\""+
+	     "data-ad-client=\"ca-pub-7534285248466198\""+
+	     "data-ad-slot=\"4095799200\""+
+	     "data-ad-format=\"auto\"></ins>"+
+	"<script>"+
+	"(adsbygoogle = window.adsbygoogle || []).push({});"+
+	"</script>";
 
+	public static final String ListTop = ""+
+			"<script async src=\"//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js\"></script>"+
+			"<!-- auto_top -->"+
+			"<ins class=\"adsbygoogle\""+
+			     "style=\"display:block\""+
+			     "data-ad-client=\"ca-pub-7534285248466198\""+
+			     "data-ad-slot=\"4256713205\""+
+			     "data-ad-format=\"auto\"></ins>"+
+			"<script>"+
+			"(adsbygoogle = window.adsbygoogle || []).push({});"+
+			"</script>";
 
+	public static final String ListEnd = ""+
+			"<script async src=\"//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js\"></script>"+
+			"<!-- auto_top -->"+
+			"<ins class=\"adsbygoogle\""+
+			     "style=\"display:block\""+
+			     "data-ad-client=\"ca-pub-7534285248466198\""+
+			     "data-ad-slot=\"5572532403\""+
+			     "data-ad-format=\"auto\"></ins>"+
+			"<script>"+
+			"(adsbygoogle = window.adsbygoogle || []).push({});"+
+			"</script>";
 
 
 
