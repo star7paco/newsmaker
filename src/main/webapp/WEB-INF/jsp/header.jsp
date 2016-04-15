@@ -22,6 +22,12 @@
   ga('send', 'pageview');
 
 </script>
+<style>
+img{
+ max-width: 100%;
+ height: auto;
+}
+</style>
 <!-- Bootstrap core CSS -->
 <link href="http://getbootstrap.com/dist/css/bootstrap.min.css" rel="stylesheet">
 <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
@@ -31,7 +37,7 @@
 <![endif]-->
 </head>
 <body>
-
+<header class="container-fluid bHead">
 
 <div class="container">
 <div class="header clearfix">
@@ -54,13 +60,30 @@ if (UserServiceFactory.getUserService().getCurrentUser() != null) { %>
 
     </ul>
   </nav>
-
-
   <h3 class="text-muted"><a href="/">일본 뉴스</a></h3>
 </div>
 
+<div class="container">
+  <ul class="nav nav-tabs nav-justified">
+   <c:if test="${ category == null }"><li class="active"><a href="/post-list">모든 뉴스</a></li></c:if>
+   <c:if test="${ category != null }"><li class=""><a href="/post-list">모든 뉴스</a></li></c:if>
+   <c:forEach var="menu" items="${ui.menus}">
+   <c:if test="${ category == null }">
+    <li class=""><a href="/post-list?c=${menu.id}&p=">${menu.name}</a></li>
+   </c:if>
+   <c:if test="${ category != null && category.id != menu.id }">
+    <li class=""><a href="/post-list?c=${menu.id}&p=">${menu.name}</a></li>
+   </c:if>
+   <c:if test="${ category != null && category.id == menu.id }">
+    <li class="active"><a href="/post-list?c=${menu.id}&p=">${menu.name}</a></li>
+   </c:if>
+   </c:forEach>
+  </ul>
 </div>
 
+<hr>
+</div>
+</header>
 
 
 

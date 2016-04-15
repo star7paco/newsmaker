@@ -36,6 +36,7 @@ import com.s7soft.gae.news.repository.PostRespository;
 import com.s7soft.gae.news.repository.TargetRespository;
 import com.s7soft.gae.news.rss.RssReader;
 import com.s7soft.gae.news.translation.TranslationUtil;
+import com.s7soft.gae.news.ui.UI;
 import com.s7soft.gae.news.util.HtmlUtil;
 
 @Controller
@@ -194,7 +195,6 @@ public class NewsController {
 				saveObj.setCategoryName(postCategory.getName());
 				postRepo.save(saveObj);
 			}
-
 		}
 
 
@@ -203,7 +203,7 @@ public class NewsController {
 		model.addAttribute("title", "news:" + p);
 		model.addAttribute("keywords", keywords);
 		model.addAttribute("category", category);
-
+		model.addAttribute("ui", getUI());
 		return "post-list";
 	}
 
@@ -238,8 +238,15 @@ public class NewsController {
 			post.setKeywords(HtmlUtil.delTag(post.getKeywords()));
 			post.setOriginalTitle(HtmlUtil.delTag(post.getOriginalTitle()));
 
-			if( post.getVideourl() != null && post.getVideourl().trim().length() > 0 &&  post.getVideourl().contains("www.facebook.com") ){
+			if( !StringUtils.isEmpty(post.getVideourl()) &&  post.getVideourl().contains("www.facebook.com") ){
 				post.setVideourl("");
+			}
+
+			// data 後修正 カテゴリ名追加
+			if(StringUtils.isEmpty(post.getCategoryName())){
+				System.out.println("Update post Category Name");
+				CategoryClass postCategory = getCategory(post.getCategoryId());
+				post.setCategoryName(postCategory.getName());
 			}
 
 			if(!AdminUtil.isAdminUser()){
@@ -267,6 +274,8 @@ public class NewsController {
 		model.addAttribute("keywords", keywords);
 		model.addAttribute("page", intPage);
 		model.addAttribute("post", post);
+		model.addAttribute("ui", getUI());
+
 		return "post";
 	}
 
@@ -349,7 +358,8 @@ public class NewsController {
 	@RequestMapping("cron/rss-read")
 	String rssRead() {
 		log.info("STAR RssRead");
-		List<CategoryClass> categoryList = categoryRepo.findAll();
+//		List<CategoryClass> categoryList = categoryRepo.findAll();
+		List<CategoryClass> categoryList = getUI().getMenus();
 		for (CategoryClass category : categoryList) {
 			List<TargetClass> targetList = RssReader.readRss(category);
 			for (TargetClass target : targetList) {
@@ -410,19 +420,24 @@ public class NewsController {
 			}
 
 			if (parser.getNewsLinkTag() != null && !parser.getNewsLinkTag().isEmpty()) {
-				TargetClass saveObj = Parser.parsing(target, parser);
-				targetRepo.save(saveObj);
+				try {
+					TargetClass saveObj = Parser.parsing(target, parser);
+					targetRepo.save(saveObj);
 
-				TargetClass newTarget = new TargetClass();
-				BeanUtils.copyProperties(target, newTarget);
-				newTarget.setId(null); // urlチェック用に旧URLを作成
-				newTarget.setStatus(4);
-				targetRepo.save(newTarget);
-
+					TargetClass newTarget = new TargetClass();
+					BeanUtils.copyProperties(target, newTarget);
+					newTarget.setId(null); // urlチェック用に旧URLを作成
+					newTarget.setStatus(4);
+					targetRepo.save(newTarget);
+				} catch (Exception e) {
+				}
 
 			}else{
-				TargetClass saveObj = Parser.parsing(target, parser);
-				targetRepo.save(saveObj);
+				try {
+					TargetClass saveObj = Parser.parsing(target, parser);
+					targetRepo.save(saveObj);
+				} catch (Exception e) {
+				}
 			}
 
 
@@ -481,8 +496,8 @@ public class NewsController {
 					try {
 						PostClass post = TranslationUtil.trans(target);
 
-//						CategoryClass category = getCategory(post.getCategoryId());
-//						post.setCategoryName(category.getName());
+						CategoryClass category = getCategory(post.getCategoryId());
+						post.setCategoryName(category.getName());
 
 						postRepo.save(post);
 					} catch (Exception e) {
@@ -565,5 +580,22 @@ public class NewsController {
 		if(p != null){
 			syncCache.put("p"+p.getId(), p);
 		}
+	}
+
+
+	private UI getUI() {
+		// メモリキャッシュでデータを取得
+		MemcacheService syncCache = MemcacheServiceFactory.getMemcacheService();
+		syncCache.setErrorHandler(ErrorHandlers.getConsistentLogAndContinue(Level.INFO));
+
+		UI ui = (UI)syncCache.get(UI.UI_CACHE_KEY);
+		if(ui != null){
+			return ui;
+		}else{
+			List<CategoryClass> categoryList = categoryRepo.findAll();
+			ui = new UI(categoryList);
+			return ui;
+		}
+
 	}
 }

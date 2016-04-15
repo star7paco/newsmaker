@@ -24,7 +24,7 @@ public class Parser {
 		return targetList;
 	}
 
-	public static TargetClass parsing(TargetClass input, ParserClass parser) {
+	public static TargetClass parsing(TargetClass input, ParserClass parser) throws Exception {
 		TargetClass target = new TargetClass();
 		BeanUtils.copyProperties(input, target);
 
@@ -63,7 +63,7 @@ public class Parser {
 		return target;
 	}
 
-	private static TargetClass getNews(TargetClass target, ParserClass parser) {
+	private static TargetClass getNews(TargetClass target, ParserClass parser) throws Exception {
 
 		if(parser == null){
 			return target;
@@ -90,7 +90,7 @@ public class Parser {
 		return "";
 	}
 
-	private static TargetClass getNewsByToEnd(TargetClass target, ParserClass parser) {
+	private static TargetClass getNewsByToEnd(TargetClass target, ParserClass parser) throws Exception {
 		try {
 			Document doc = Jsoup.connect(target.getUrl()).userAgent("Mozilla/5.0 (Windows NT 6.1; WOW64; rv:5.0) Gecko/20100101 Firefox/5.0").get();
 
@@ -100,39 +100,13 @@ public class Parser {
 			} catch (Exception e) {
 			}
 
-
 			String html = doc.getAllElements().html();
 
 			//<h1 class="title">[動画] HKT48 なこみく＆めるみお「アインシュタインよりディアナ・アグロン」MV（Short ver.）公開！</h1>
 
 			String title = getText(html, parser.getStartTitle(), parser.getEndTitle());
 			String body = getText(html, parser.getStartBody(), parser.getEndBody());
-
-			// youtubeのlinkを取得
-			Pattern p = Pattern.compile("<\\s*iframe.*src\\s*=\\s*([\\\"'])?([^ \\\"']*)[^>]*>");
-			Matcher m = p.matcher(html);
-			if (m.find()) {
-				String src = m.group(2);//ここにURLが入る
-				if( !src.contains("www.facebook.com") ){
-					System.out.println(src);
-					target.addVideourl(src);
-				}
-			}
-
-
-			// 画像のlinkを取得 + 動画の場合は動画を追加する。
-			Pattern imgP = Pattern.compile("<\\s*img.*src\\s*=\\s*([\\\"'])?([^ \\\"']*)[^>]*>");
-			Matcher imgM = imgP.matcher(getHtml(html, parser.getStartBody(), parser.getEndBody()));
-			if (imgM.find()) {
-				String src = imgM.group(2);//ここにURLが入る
-				if( src.contains("//www.youtube") ){
-					System.out.println(src);
-					target.addVideourl(src);
-				}else{
-					target.addImgurl(src);
-				}
-
-			}
+			getMedia(target, getHtml(html, parser.getStartBody(), parser.getEndBody()));
 
 
 			target.setTitle(title);
@@ -147,11 +121,12 @@ public class Parser {
 		} catch (IOException e) {
 			System.out.println(target.getUrl());
 			e.printStackTrace();
+			throw e;
 		}
 		return target;
 	}
 
-	private static TargetClass getNewsByClassName(TargetClass target, ParserClass parser) {
+	private static TargetClass getNewsByClassName(TargetClass target, ParserClass parser) throws Exception {
 		try {
 			Document doc = Jsoup.connect(target.getUrl()).userAgent("Mozilla/5.0 (Windows NT 6.1; WOW64; rv:5.0) Gecko/20100101 Firefox/5.0").get();
 
@@ -165,14 +140,18 @@ public class Parser {
 			} catch (Exception e) {
 			}
 			try {
-				body =  doc.getElementsByClass(parser.getBodyTag()).text();
+				Elements elements = doc.getElementsByClass(parser.getBodyTag());
+				body =  elements.text();
+				getMedia(target, elements.html());
 			} catch (Exception e) {
 			}
 
 			// TODO 特別対応を無くしたい
 			if( target.getUrl().contains("headlines.yahoo.co.jp/video") ){
 				title =  doc.getElementsByClass("yjXL").text();
-				body =  doc.getElementsByClass("ymuiContainerNopad").text();
+				Elements elements = doc.getElementsByClass("ymuiContainerNopad");
+				body =  elements.text();
+				getMedia(target, elements.html());
 
 			}else {
 				try {
@@ -197,6 +176,7 @@ public class Parser {
 
 		} catch (IOException e) {
 			e.printStackTrace();
+			throw e;
 		}
 		return target;
 	}
@@ -260,4 +240,30 @@ public class Parser {
 		return txt.substring(start, end);
 	}
 
+	public static void getMedia(TargetClass target ,String html){
+		// youtubeのlinkを取得
+		Pattern p = Pattern.compile("<\\s*iframe.*src\\s*=\\s*([\\\"'])?([^ \\\"']*)[^>]*>");
+		Matcher m = p.matcher(html);
+		if (m.find()) {
+			String src = m.group(2);//ここにURLが入る
+			if( src.contains("//www.youtube") ){
+				System.out.println(src);
+				target.addVideourl(src);
+			}
+		}
+
+
+		// 画像のlinkを取得 + 動画の場合は動画を追加する。
+		Pattern imgP = Pattern.compile("<\\s*img.*src\\s*=\\s*([\\\"'])?([^ \\\"']*)[^>]*>");
+		Matcher imgM = imgP.matcher(html);
+		if (imgM.find()) {
+			String src = imgM.group(2);//ここにURLが入る
+			if( src.contains("//www.youtube") ){
+				System.out.println(src);
+				target.addVideourl(src);
+			}else{
+				target.addImgurl(src);
+			}
+		}
+	}
 }

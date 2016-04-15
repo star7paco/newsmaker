@@ -3,7 +3,7 @@
     <!-- 이부분을 프로젝트 아이디로 설정해주면 된다.  -->
     <application>${app.id}</application>
     <!-- 여기가 버젼이 다른 부분이다. 이곳을 다른 버젼으로 만들어주면 다른 버젼으로 올라간다.  -->
-    <version>${app.version}</version>
+    <version>2</version>
     <threadsafe>true</threadsafe>
 
     <system-properties>

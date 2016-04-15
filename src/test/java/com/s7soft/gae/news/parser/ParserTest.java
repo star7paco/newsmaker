@@ -22,12 +22,17 @@ public class ParserTest {
 	public void parsering() {
 
 		for (CategoryClass category : CategoryClass.getDefault()) {
-			parsering(category);
+			try {
+				parsering(category);
+			} catch (Exception e) {
+				// TODO 自動生成された catch ブロック
+				e.printStackTrace();
+			}
 		}
 
 	}
 
-	public void parsering(CategoryClass category ) {
+	public void parsering(CategoryClass category ) throws Exception {
 		List<TargetClass> list = RssReader.readRss(category);
 
 		for (TargetClass target : list) {

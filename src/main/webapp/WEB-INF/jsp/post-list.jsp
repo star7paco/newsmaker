@@ -5,21 +5,17 @@
 <%@ page contentType="text/html; charset=UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 
-
-<div class="container">
-<%= AdSense.ListTop %>
-<hr>
-
  <c:choose>
    <c:when test="${category != null}">
     <c:set var="pageUrl" value="/post-list?c=${category.id}&p=" />
-    ${category.name} &nbsp &lt; &nbsp <a href="/post-list">모든 뉴스 표시</a>
-    <hr>
    </c:when>
    <c:otherwise>
     <c:set var="pageUrl" value="/post-list?p=" />
    </c:otherwise>
   </c:choose>
+
+<div class="container">
+<%= AdSense.ListTop %>
 
 <div class="bs-example">
 <c:forEach var="post" items="${postList.content}">

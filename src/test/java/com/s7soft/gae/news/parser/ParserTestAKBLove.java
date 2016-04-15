@@ -19,7 +19,7 @@ public class ParserTestAKBLove {
 			};
 
 	@Test
-	public void parsering() {
+	public void parsering() throws Exception {
 		CategoryClass category = new CategoryClass();
 		category.setName("AKB LOVE");
 		category.setUrl("http://akb.48lover.com/");
@@ -28,7 +28,7 @@ public class ParserTestAKBLove {
 		parsering(category);
 	}
 
-	public void parsering(CategoryClass category ) {
+	public void parsering(CategoryClass category ) throws Exception {
 		List<TargetClass> list = RssReader.readRss(category);
 
 		for (TargetClass target : list) {
@@ -64,7 +64,7 @@ public class ParserTestAKBLove {
 
 
 	@Test
-	public void testdata() {
+	public void testdata() throws Exception {
 		String postUrl = "http://akb.48lover.com/log/29105";
 		TargetClass target = new TargetClass();
 		target.setUrl(postUrl);

@@ -25,7 +25,7 @@ public class TranslationUtilTest  {
 
 
 
-	public void 長い本文を通訳(){
+	public void 長い本文を通訳() throws Exception{
 		String url = "http://headlines.yahoo.co.jp/hl?a=20160413-00000322-oric-ent";
 		TargetClass target = new TargetClass();
 		target.setUrl(url);

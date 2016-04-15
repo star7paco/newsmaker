@@ -16,7 +16,7 @@ public class ParserTestYahoo {
 
 
 
-	public void parsering() {
+	public void parsering() throws Exception {
 
 		TargetClass target = new TargetClass();
 		target.setUrl("http://news.yahoo.co.jp/pickup/6195601");
@@ -59,7 +59,7 @@ public class ParserTestYahoo {
 	}
 
 	@Test
-	public void rssAndParsing(){
+	public void rssAndParsing() throws Exception{
 
 		List<TargetClass> retList = new ArrayList<TargetClass>();
 
@@ -92,4 +92,25 @@ public class ParserTestYahoo {
 		}
 	}
 
+	@Test
+	public void carv_get_img(){
+		String url = "http://headlines.yahoo.co.jp/hl?a=20160412-00010000-carv-ind";
+		TargetClass target = new TargetClass();
+		target.setUrl(url);
+
+
+		for(ParserClass parser: ParserClass.getDefault()){
+			if(!target.getUrl().contains(parser.getKey())){
+				continue;
+			}
+			try {
+				TargetClass ret = Parser.parsing(target, parser);
+				System.out.println(ret.getImgurl());
+			} catch (Exception e) {
+				// TODO 自動生成された catch ブロック
+				e.printStackTrace();
+			}
+
+		}
+	}
 }
