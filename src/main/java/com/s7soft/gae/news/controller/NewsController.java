@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.servlet.http.HttpSession;
+
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -14,6 +16,7 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -21,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.google.appengine.api.memcache.ErrorHandlers;
 import com.google.appengine.api.memcache.MemcacheService;
 import com.google.appengine.api.memcache.MemcacheServiceFactory;
+import com.s7soft.gae.news.admin.AdminUtil;
 import com.s7soft.gae.news.domain.CategoryClass;
 import com.s7soft.gae.news.domain.ParserClass;
 import com.s7soft.gae.news.domain.PostClass;
@@ -38,7 +42,7 @@ import com.s7soft.gae.news.util.HtmlUtil;
 public class NewsController {
 
 	private static final Logger log = Logger.getLogger(NewsController.class.getName());
-	private static final int RUN_TIME = 30 * 1000;
+	private static final int RUN_TIME = 29 * 1000;
 
 	@Autowired
 	ParserRespository parserRepo;
@@ -53,8 +57,8 @@ public class NewsController {
 	TargetRespository targetRepo;
 
 	@RequestMapping("/")
-	String index(Model model) {
-		return postList(0, model);
+	String index(HttpSession session, Model model) {
+		return postList(session, model , 0 , 0L);
 	}
 
 	@RequestMapping("/admin")
@@ -155,23 +159,51 @@ public class NewsController {
 		return "redirect:/admin/parser-list";
 	}
 
+
+
 	@RequestMapping("post-list")
-	String postList( Model model ) {
-		return postList(0, model);
-	}
+	String postList(HttpSession session, Model model, @RequestParam(required = false) Integer p,  @RequestParam(required = false) Long c) {
 
-	@RequestMapping("post-list/{page}")
-	String postList(@PathVariable("page") Integer page, Model model) {
-
-		if(page  < 0){
-			page = 0;
+		if(p == null || p  < 0){
+			p = 0;
 		}
 
-		Pageable pageable = new PageRequest(page, 12 , Direction.DESC , "date");
-		Page<PostClass> postList = postRepo.findByStatus(1, pageable);
+		if(c == null || c  < 0){
+			c = 0l;
+		}
+
+		Page<PostClass> postList = null;
+		CategoryClass category =  getCategory(c);
+		String keywords = "일본,뉴스";
+
+		Pageable pageable = new PageRequest(p, 12 , Direction.DESC , "date");
+		if(category == null){
+			postList = postRepo.findByStatus(1, pageable);
+		}else{
+//			Pageable pageable = new PageRequest(0, 6 , Direction.DESC , "clickCount", "date");
+			postList = postRepo.findByCategoryIdAndStatus(c, 1, pageable);
+			keywords = keywords + "," + category.getName();
+		}
+
+		for (PostClass post : postList) {
+			if(StringUtils.isEmpty(post.getCategoryName())){
+				System.out.println("Update post Category Name");
+				CategoryClass postCategory = getCategory(post.getCategoryId());
+				PostClass saveObj = new PostClass();
+				BeanUtils.copyProperties(post, saveObj);
+				saveObj.setCategoryName(postCategory.getName());
+				postRepo.save(saveObj);
+			}
+
+		}
+
+
 		model.addAttribute("postList", postList);
-		model.addAttribute("page", page);
-		model.addAttribute("title", "news" + page);
+		model.addAttribute("page", p);
+		model.addAttribute("title", "news:" + p);
+		model.addAttribute("keywords", keywords);
+		model.addAttribute("category", category);
+
 		return "post-list";
 	}
 
@@ -183,17 +215,8 @@ public class NewsController {
 		} catch (Exception e) {
 		}
 
-		// メモリキャッシュでデータを取得
-		MemcacheService syncCache = MemcacheServiceFactory.getMemcacheService();
-		syncCache.setErrorHandler(ErrorHandlers.getConsistentLogAndContinue(Level.INFO));
-		PostClass dsPost = (PostClass) syncCache.get(postId);
-		if(dsPost == null){
-			dsPost = postRepo.findOne(postId);
-		}
-
-
+		PostClass dsPost = getPost(postId);
 		PostClass post = new PostClass();
-
 
 		CategoryClass category = null;
 		String keywords = "";
@@ -219,9 +242,11 @@ public class NewsController {
 				post.setVideourl("");
 			}
 
-			post.setClickCount(post.getClickCount()+1);
+			if(!AdminUtil.isAdminUser()){
+				post.setClickCount(post.getClickCount()+1);
+			}
 			postRepo.save(post);
-			syncCache.put(post.getId(), post);
+			updateCachePost( post);
 
 			model.addAttribute("title", post.getStringTitle());
 
@@ -250,13 +275,13 @@ public class NewsController {
 
 		PostClass dsPost = postRepo.findOne(id);
 		if(dsPost == null){
-			return "redirect:/post-list";
+			return "redirect:admin/post-list";
 		}
 		PostClass post = new PostClass();
 		BeanUtils.copyProperties(dsPost, post);
 		post.setStatus(status);
 		postRepo.save(post);
-		return "redirect:/post-list";
+		return "redirect:admin/post-list";
 	}
 
 	/**  target */
@@ -350,22 +375,11 @@ public class NewsController {
 		log.info("STAR postMaker");
 		List<ParserClass> parsers = parserRepo.findByStatus(1);
 
-
-//		MemcacheService syncCache = MemcacheServiceFactory.getMemcacheService();
-//		syncCache.setErrorHandler(ErrorHandlers.getConsistentLogAndContinue(Level.INFO));
-//		@SuppressWarnings("unchecked")
-//		List<ParserClass> parsers = (List<ParserClass>) syncCache.get(Parser.MemcacheServiceKey);
-//		Date cacheTime = (Date) syncCache.get(Parser.MemcacheServiceTimeKey);
-//		if (parsers == null ) {
-//			parsers = parserRepo.findByStatus(1);
-//			Calendar  cal = Calendar.getInstance();
-//			cal.add(Calendar.MINUTE, 90);
-//			syncCache.put(Parser.MemcacheServiceKey, parsers); // Populate
-//			syncCache.put(Parser.MemcacheServiceTimeKey, cal.getTime());
-//		}
-
 		int count = 0;
 		List<TargetClass> targetList = targetRepo.findByStatus(1);
+
+		System.out.println("targetList size : "+ targetList.size());
+
 		for (TargetClass target : targetList) {
 			count++;
 //			if(count > 3){
@@ -466,9 +480,17 @@ public class NewsController {
 				if(list.size() < 1){
 					try {
 						PostClass post = TranslationUtil.trans(target);
+
+//						CategoryClass category = getCategory(post.getCategoryId());
+//						post.setCategoryName(category.getName());
+
 						postRepo.save(post);
 					} catch (Exception e) {
-
+						System.out.println(e.getMessage());
+						if(e.getMessage().contains("www.excite.co.jp")){
+							System.out.println("time out skip");
+							continue;
+						}
 						// 通訳失敗
 						error++;
 						TargetClass saveObj = new TargetClass();
@@ -495,5 +517,53 @@ public class NewsController {
 		System.out.println("trans error: "+error);
 		System.out.println("END trans : "+count);
 		return "index";
+	}
+
+
+	private CategoryClass getCategory(long id) {
+		// メモリキャッシュでデータを取得
+		MemcacheService syncCache = MemcacheServiceFactory.getMemcacheService();
+		syncCache.setErrorHandler(ErrorHandlers.getConsistentLogAndContinue(Level.INFO));
+
+		CategoryClass category = null;
+		if(id > 0){
+			category =(CategoryClass)syncCache.get("c"+id);
+
+			if(category == null){
+				category = categoryRepo.findOne(id);
+				if(category != null){
+					syncCache.put("c"+id, category);
+				}
+
+			}
+		}
+		return category;
+	}
+
+	private PostClass getPost(long id) {
+		// メモリキャッシュでデータを取得
+		MemcacheService syncCache = MemcacheServiceFactory.getMemcacheService();
+		syncCache.setErrorHandler(ErrorHandlers.getConsistentLogAndContinue(Level.INFO));
+
+		PostClass post = null;
+		if(id > 0){
+			post =(PostClass)syncCache.get("p"+id);
+			if(post == null){
+				post = postRepo.findOne(id);
+				if(post != null){
+					syncCache.put("p"+id, post);
+				}
+			}
+		}
+		return post;
+	}
+
+	private void updateCachePost(PostClass p) {
+		// メモリキャッシュでデータを取得
+		MemcacheService syncCache = MemcacheServiceFactory.getMemcacheService();
+		syncCache.setErrorHandler(ErrorHandlers.getConsistentLogAndContinue(Level.INFO));
+		if(p != null){
+			syncCache.put("p"+p.getId(), p);
+		}
 	}
 }

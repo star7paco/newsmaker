@@ -1,5 +1,6 @@
 package com.s7soft.gae.news.domain;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -12,7 +13,9 @@ import org.springframework.stereotype.Component;
 
 @Entity
 @Component
-public class CategoryClass {
+public class CategoryClass implements Serializable{
+
+	private static final long serialVersionUID = 1L;
 
 	public static List<CategoryClass> getDefault(){
 		List<CategoryClass> categorys = new ArrayList<CategoryClass>();

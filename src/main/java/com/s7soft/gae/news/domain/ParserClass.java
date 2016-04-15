@@ -1,5 +1,6 @@
 package com.s7soft.gae.news.domain;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -14,7 +15,9 @@ import com.s7soft.gae.news.util.HtmlUtil;
 
 @Entity
 @Component
-public class ParserClass{
+public class ParserClass implements Serializable{
+
+	private static final long serialVersionUID = 1L;
 
 	public static List<ParserClass> getDefault(){
 

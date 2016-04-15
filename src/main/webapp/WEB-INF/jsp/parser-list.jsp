@@ -3,6 +3,7 @@
 <title>parser-InsertTitleMessage</title>
 <h3>parser 리스트[${parsercount}]</h3>
 
+<div class="container">
 <c:if test="${parserlist != null}" >
 <table border="1">
 <tr>
@@ -92,3 +93,4 @@
 </c:if>
 
 <a href="/">戻る</a>
+</div>

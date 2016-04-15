@@ -1,20 +1,26 @@
 <%@page import="com.s7soft.gae.news.adsense.AdSense"%>
+<%@page import="java.util.Map"%>
+<%@page import="com.s7soft.gae.news.util.CommanUtil"%>
+<%@page import="com.s7soft.gae.news.domain.CategoryClass"%>
 <%@ page contentType="text/html; charset=UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-<div class="container">
-<%= AdSense.AutoTop %>
 
-  <c:choose>
-   <c:when test="${isAdmin != null}">
-     <c:set var="pageUrl" value="/admin/post-list/" />
-    </c:when>
+
+<div class="container">
+<%= AdSense.ListTop %>
+<hr>
+
+ <c:choose>
+   <c:when test="${category != null}">
+    <c:set var="pageUrl" value="/post-list?c=${category.id}&p=" />
+    ${category.name} &nbsp &lt; &nbsp <a href="/post-list">모든 뉴스 표시</a>
+    <hr>
+   </c:when>
    <c:otherwise>
-     <c:set var="pageUrl" value="/post-list/" />
-    </c:otherwise>
+    <c:set var="pageUrl" value="/post-list?p=" />
+   </c:otherwise>
   </c:choose>
 
-
-<hr>
 <div class="bs-example">
 <c:forEach var="post" items="${postList.content}">
 <div class="media">
@@ -24,16 +30,14 @@
    </a>
   </div>
   <div class="media-body">
-   <a href="/post/${post.id}">
-    <h4 class="media-heading">${post.stringTitle}</h4>
-    ${post.dateTime} <span class="badge">${post.clickCount}</span>
-    </a>
+   <a href="/post/${post.id}"><h4 class="media-heading">${post.stringTitle}</h4></a>
+   <a href="/post-list?c=${post.categoryId}">&lt;${post.categoryName}&gt;</a>${post.dateTime} <span class="badge">${post.clickCount}</span>
   </div>
 </div>
 <hr>
 </c:forEach>
 </div>
-
+<%= AdSense.ListEnd %>
 <nav>
  <ul class="pager">
   <c:choose>
@@ -46,7 +50,6 @@
   <li class="next"><a href="${pageUrl}${page+1}">Older<span aria-hidden="true">&rarr;</span></a></li>
  </ul>
 </nav>
-
 <div class=".col-xs-12 .col-md-8">
 <!-- google Site in Search -->
 <script>
