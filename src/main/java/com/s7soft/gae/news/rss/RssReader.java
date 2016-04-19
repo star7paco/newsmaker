@@ -64,24 +64,27 @@ public class RssReader {
 			/* Get Node list of RSS items */
 			NodeList item_list = root.getElementsByTagName("item");
 			for (int i = 0; i < item_list.getLength(); i++) {
+				try {
+					TargetClass target = new TargetClass();
 
-				TargetClass target = new TargetClass();
+					Element element = (Element) item_list.item(i);
+					NodeList item_title = element.getElementsByTagName("title");
+					NodeList item_link = element.getElementsByTagName("link");
 
-				Element element = (Element) item_list.item(i);
-				NodeList item_title = element.getElementsByTagName("title");
-				NodeList item_link = element.getElementsByTagName("link");
+					String title = item_title.item(0).getFirstChild()
+							.getNodeValue();
+					String link = item_link.item(0).getFirstChild().getNodeValue();
 
-				String title = item_title.item(0).getFirstChild()
-						.getNodeValue();
-				String link = item_link.item(0).getFirstChild().getNodeValue();
+					target.setTitle(title);
+					target.setUrl(link);
 
-				target.setTitle(title);
-				target.setUrl(link);
+					list.add(target);
 
-				list.add(target);
-
-				// System.out.println(" title: " + title);
-				// System.out.println(" link:  " + link + "\n");
+					// System.out.println(" title: " + title);
+					// System.out.println(" link:  " + link + "\n");
+				} catch (Exception e) {
+					// TODO: handle exception
+				}
 			}
 		} catch (IOException e) {
 			System.out.println("IO Exception");
