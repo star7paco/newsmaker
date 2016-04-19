@@ -16,6 +16,7 @@
 
 <div class="container">
 <%= AdSense.ListTop %>
+<hr>
 
 <div class="bs-example">
 <c:forEach var="post" items="${postList.content}">

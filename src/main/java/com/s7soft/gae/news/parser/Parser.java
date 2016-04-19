@@ -262,7 +262,9 @@ public class Parser {
 				System.out.println(src);
 				target.addVideourl(src);
 			}else{
-				target.addImgurl(src);
+				if(!src.contains("get_flash_player")){
+					target.addImgurl(src);
+				}
 			}
 		}
 	}
