@@ -1,5 +1,6 @@
 package com.s7soft.gae.news.repository;
 
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -15,5 +16,7 @@ public interface TargetRespository extends JpaRepository<TargetClass, Long> {
 	List<TargetClass> findByStatus(int status);
 
 	Page<TargetClass> findByStatus(int status , Pageable paramPageable);
+
+	List<TargetClass> findByDateBefore(Date date);
 
 }

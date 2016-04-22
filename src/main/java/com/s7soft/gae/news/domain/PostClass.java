@@ -111,7 +111,7 @@ public class PostClass implements Serializable{
 				if( url==null || url.isEmpty() ){
 					continue;
 				}
-				ret = ret + "<img class=\"media-object\" src=\""+url+"\">";
+				ret = ret + "<img class=\"img-responsive\" src=\""+url+"\">";
 			}
 			return ret;
 		}else{

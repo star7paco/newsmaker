@@ -18,8 +18,10 @@
 <a class="btn btn-primary btn-lg" role="button" href="/admin/post-list">post-list</a><br>
 <br><br><br><br>
 -RUN-<br>
-<a class="btn btn-primary btn-lg" role="button" href="/cron/rss-read">rss-read</a>
-<a class="btn btn-primary btn-lg" role="button" href="/cron/post-maker">post-maker</a>
-<a class="btn btn-primary btn-lg" role="button" href="/cron/trans">trans</a>
+<a class="btn btn-primary btn-lg col-md-4" role="button" href="/cron/rss-read">rss-read</a>
+<a class="btn btn-primary btn-lg col-md-4" role="button" href="/cron/post-maker">post-maker</a>
+<a class="btn btn-primary btn-lg col-md-4" role="button" href="/cron/trans">trans</a>
+<a class="btn btn-primary btn-lg col-md-4" role="button" href="/cron/delete-target">delete-target</a>
+
 </div>
 

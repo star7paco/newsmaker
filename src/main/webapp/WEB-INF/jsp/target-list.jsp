@@ -4,7 +4,7 @@
 <h3>Target 리스트 (${count}) </h3>
 <c:set var="pageUrl" value="/admin/target-list/" />
 
-
+<div class="container">
 <form action="${pageUrl}${page}" >
 <table border="1">
  <tr><td>status :</td><td> <input type="text" name="status" value="${status}"></td></tr>
@@ -63,3 +63,4 @@
 
 
 <a href="/">戻る</a>
+</div>

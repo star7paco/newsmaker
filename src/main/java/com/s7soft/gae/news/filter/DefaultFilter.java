@@ -26,7 +26,10 @@ public class DefaultFilter implements Filter {
 	public void doFilter(ServletRequest req, ServletResponse res,
 			FilterChain chain) throws IOException, ServletException {
 
-		URL url = new URL(((HttpServletRequest)req).getRequestURL().toString());
+		HttpServletRequest httpreq = (HttpServletRequest)req;
+
+
+		URL url = new URL(httpreq.getRequestURL().toString());
 	    String host  = url.getHost();
 
 	    // cron skip

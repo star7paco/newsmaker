@@ -1,11 +1,12 @@
 package com.s7soft.gae.news.controller;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +39,7 @@ import com.s7soft.gae.news.rss.RssReader;
 import com.s7soft.gae.news.translation.TranslationUtil;
 import com.s7soft.gae.news.ui.UI;
 import com.s7soft.gae.news.util.HtmlUtil;
+import com.s7soft.gae.news.util.TimeUtil;
 
 @Controller
 public class NewsController {
@@ -58,8 +60,8 @@ public class NewsController {
 	TargetRespository targetRepo;
 
 	@RequestMapping("/")
-	String index(HttpSession session, Model model) {
-		return postList(session, model , 0 , 0L);
+	String index(Model model) {
+		return postList(model , 0 , 0L, null);
 	}
 
 	@RequestMapping("/admin")
@@ -161,9 +163,14 @@ public class NewsController {
 	}
 
 
+	@RequestMapping("post-list/{p}")
+	String postList(@PathVariable("p") Integer page, Model model) {
+		return postList(model,page,0L,"");
+	}
+
 
 	@RequestMapping("post-list")
-	String postList(HttpSession session, Model model, @RequestParam(required = false) Integer p,  @RequestParam(required = false) Long c) {
+	String postList(Model model, @RequestParam(required = false) Integer p,  @RequestParam(required = false) Long c, @RequestParam(required = false) String hit) {
 
 		if(p == null || p  < 0){
 			p = 0;
@@ -180,8 +187,8 @@ public class NewsController {
 		Pageable pageable = new PageRequest(p, 12 , Direction.DESC , "date");
 		if(category == null){
 			postList = postRepo.findByStatus(1, pageable);
+
 		}else{
-//			Pageable pageable = new PageRequest(0, 6 , Direction.DESC , "clickCount", "date");
 			postList = postRepo.findByCategoryIdAndStatus(c, 1, pageable);
 			keywords = keywords + "," + category.getName();
 		}
@@ -198,6 +205,7 @@ public class NewsController {
 		}
 
 
+		model.addAttribute("hotpost", getHotPostByCache());
 		model.addAttribute("postList", postList);
 		model.addAttribute("page", p);
 		model.addAttribute("title", "news:" + p);
@@ -270,6 +278,9 @@ public class NewsController {
 
 		keywords = category.getName() + ","  + post.getKeywords();
 
+
+
+		model.addAttribute("hotpost", getHotPostByCache());
 		model.addAttribute("category", category);
 		model.addAttribute("keywords", keywords);
 		model.addAttribute("page", intPage);
@@ -363,9 +374,10 @@ public class NewsController {
 		for (CategoryClass category : categoryList) {
 			List<TargetClass> targetList = RssReader.readRss(category);
 			for (TargetClass target : targetList) {
-				TargetClass ret = targetRepo.findByUrl(target.getUrl());
-				if (ret != null) {
-					log.info("continue " + ret.getTitle());
+
+				// URL確認でメモリキャッシュを使用する
+				if ( isUrlOnTarget( target.getUrl() ) ) {
+					log.info("continue " + target.getTitle());
 					continue;
 				}
 				target.setCategoryId(category.getId());
@@ -534,20 +546,54 @@ public class NewsController {
 		return "index";
 	}
 
+	/** cron job */
+	@RequestMapping("cron/delete-target")
+	String deleteTarget() {
+		long start = System.currentTimeMillis();
+		log.info("STAR DeleteTarget");
+		int count = 0;
+
+		  // カレンダークラスのインスタンスを取得
+        Calendar cal = Calendar.getInstance();
+        // 10日前
+        cal.add(Calendar.DATE, -10);
+        Date date = cal.getTime();
+        log.info("delete date : " + TimeUtil.format(date));
+
+		List<TargetClass> targetList = targetRepo.findByDateBefore(date);
+		log.info("targetList size : " + targetList.size());
+
+		for (TargetClass target : targetList) {
+
+			targetRepo.delete( target.getId() );
+			 count ++;
+			if( start + RUN_TIME < System.currentTimeMillis()  ){
+				break;
+			}
+		}
+
+		log.info("END DeleteTarget : " + count);
+		return "index";
+	}
+
+	private MemcacheService getMemcache(String name){
+		MemcacheService syncCache = MemcacheServiceFactory.getMemcacheService(name);
+		syncCache.setErrorHandler(ErrorHandlers.getConsistentLogAndContinue(Level.INFO));
+		return syncCache;
+	}
 
 	private CategoryClass getCategory(long id) {
 		// メモリキャッシュでデータを取得
-		MemcacheService syncCache = MemcacheServiceFactory.getMemcacheService();
-		syncCache.setErrorHandler(ErrorHandlers.getConsistentLogAndContinue(Level.INFO));
+		MemcacheService syncCache = getMemcache(CategoryClass.class.getName());
 
 		CategoryClass category = null;
 		if(id > 0){
-			category =(CategoryClass)syncCache.get("c"+id);
+			category =(CategoryClass)syncCache.get(id);
 
 			if(category == null){
 				category = categoryRepo.findOne(id);
 				if(category != null){
-					syncCache.put("c"+id, category);
+					syncCache.put(id, category);
 				}
 
 			}
@@ -557,36 +603,133 @@ public class NewsController {
 
 	private PostClass getPost(long id) {
 		// メモリキャッシュでデータを取得
-		MemcacheService syncCache = MemcacheServiceFactory.getMemcacheService();
-		syncCache.setErrorHandler(ErrorHandlers.getConsistentLogAndContinue(Level.INFO));
+		MemcacheService syncCache = getMemcache(PostClass.class.getName());
 
 		PostClass post = null;
 		if(id > 0){
-			post =(PostClass)syncCache.get("p"+id);
+			post =(PostClass)syncCache.get(id);
 			if(post == null){
 				post = postRepo.findOne(id);
 				if(post != null){
-					syncCache.put("p"+id, post);
+					syncCache.put(id, post);
 				}
 			}
 		}
 		return post;
 	}
 
+
+	private List<PostClass> getHotPost() {
+		log.info("start DB hot post");
+		List<PostClass> list = null;
+        Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.DATE, -1);
+        Date date = cal.getTime();
+		list =  postRepo.findByDateAfter(date);
+
+		log.info("list.size : " + list.size());
+
+		PostClass rank[] = new PostClass[3];
+
+		if(list.size() > 4 ){
+			for (PostClass post : list) {
+				if(rank[0] == null ){
+					rank[0] = post;
+					rank[1] = post;
+					rank[2] = post;
+					continue;
+				}
+
+
+				for (int i = 0; i < rank.length; i++) {
+					if(rank[i].getClickCount() < post.getClickCount() ){
+						rank[i] = post;
+						break;
+					}
+				}
+
+
+				if(rank[0].getId() == rank[1].getId()){
+					rank[1] = post;
+				}else if(rank[1].getId() == rank[2].getId()){
+					rank[2] = post;
+				}else if(rank[0].getId() == rank[2].getId()){
+					rank[2] = post;
+				}
+
+			}
+		}
+
+		list = Arrays.asList(rank);
+
+		log.info("end DB hot post");
+		return list;
+	}
+
+
+	private List<PostClass> getHotPostByCache() {
+		log.info("start getHotPostByCache");
+		List<PostClass> list = null;
+		// メモリキャッシュでデータを取得
+		MemcacheService syncCache = getMemcache("HOT_POST");
+
+
+		final String timeKey = "LAST_UP_TIME";
+		Long now = System.currentTimeMillis();
+		Long lasttime = (Long)syncCache.get(timeKey);
+		long cacheTime = 1000 * 60 * 60;
+//		long cacheTime = 1000;
+
+		PostClass rank1 = (PostClass)syncCache.get("1");
+		PostClass rank2 = (PostClass)syncCache.get("2");
+		PostClass rank3 = (PostClass)syncCache.get("3");
+
+		if(rank1 == null || rank2 == null || rank3 == null || lasttime == null ||  lasttime < ( now - cacheTime) ){
+
+			syncCache.clearAll();
+			log.info("clearAll Hot Post MemcacheService");
+
+			log.info("add Hot Post MemcacheService");
+			list = getHotPost();
+
+			if(list.size() >= 3){
+
+				syncCache.put("1", list.get(0));
+				syncCache.put("2", list.get(1));
+				syncCache.put("3", list.get(2));
+
+				syncCache.put(timeKey, now);
+			}
+
+		}
+		else{
+			list = new ArrayList<PostClass>();
+
+			list.add(rank1);
+			list.add(rank2);
+			list.add(rank3);
+
+		}
+
+		log.info("end getHotPostByCache");
+		return list;
+	}
+
+
+
+
 	private void updateCachePost(PostClass p) {
 		// メモリキャッシュでデータを取得
-		MemcacheService syncCache = MemcacheServiceFactory.getMemcacheService();
-		syncCache.setErrorHandler(ErrorHandlers.getConsistentLogAndContinue(Level.INFO));
+		MemcacheService syncCache = getMemcache(PostClass.class.getName());
 		if(p != null){
-			syncCache.put("p"+p.getId(), p);
+			syncCache.put(p.getId(), p);
 		}
 	}
 
 
 	private UI getUI() {
 		// メモリキャッシュでデータを取得
-		MemcacheService syncCache = MemcacheServiceFactory.getMemcacheService();
-		syncCache.setErrorHandler(ErrorHandlers.getConsistentLogAndContinue(Level.INFO));
+		MemcacheService syncCache = getMemcache(UI.class.getName());
 
 		UI ui = (UI)syncCache.get(UI.UI_CACHE_KEY);
 		if(ui != null){
@@ -596,6 +739,19 @@ public class NewsController {
 			ui = new UI(categoryList);
 			return ui;
 		}
+	}
+
+	private boolean isUrlOnTarget(String url) {
+		// メモリキャッシュでデータを取得
+		MemcacheService syncCache = getMemcache(RssReader.class.getName());
+		boolean ret = true;
+
+		String cacheUrl =(String)syncCache.get(url);
+		if( StringUtils.isEmpty(cacheUrl) && targetRepo.findByUrl(url) == null){
+			ret = false;
+		}
+		syncCache.put(url, "0");
+		return ret;
 
 	}
 }

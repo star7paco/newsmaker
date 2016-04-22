@@ -3,22 +3,32 @@
   <cron>
     <url>/cron/rss-read</url>
     <description>cron job Rss Read</description>
-    <schedule>every 5 minutes</schedule>
+    <schedule>every 15 minutes</schedule>
     <timezone>Asia/Tokyo</timezone>
   </cron>
 
   <cron>
     <url>/cron/post-maker</url>
     <description>cron job Rss Read</description>
-    <schedule>every 3 minutes</schedule>
+    <schedule>every 10 minutes</schedule>
     <timezone>Asia/Tokyo</timezone>
   </cron>
 
   <cron>
     <url>/cron/trans</url>
     <description>cron job Translation</description>
-    <schedule>every 3 minutes</schedule>
+    <schedule>every 10 minutes</schedule>
     <timezone>Asia/Tokyo</timezone>
   </cron>
+
+  <cron>
+    <url>/cron/delete-target</url>
+    <description>cron job delete-target</description>
+    <schedule>every 60 minutes</schedule>
+    <timezone>Asia/Tokyo</timezone>
+  </cron>
+
+
+
 
 </cronentries>

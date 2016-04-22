@@ -24,6 +24,7 @@ public class CategoryClass implements Serializable{
 		category.setName("Yahoo top");
 		category.setRssUrl("http://news.yahoo.co.jp/pickup/rss.xml");
 		category.setUrl("http://www.yahoo.co.jp/");
+		category.setLocation("ko");
 		category.setStatus(1);
 		category.setDate(new Date());
 		categorys.add( category);
@@ -33,6 +34,7 @@ public class CategoryClass implements Serializable{
 		category2.setName("AKB LOVE");
 		category2.setUrl("http://akb.48lover.com/");
 		category2.setRssUrl("http://akb.48lover.com/rss");
+		category2.setLocation("ko");
 		category2.setDate(new Date());
 		categorys.add( category2);
 
@@ -41,6 +43,7 @@ public class CategoryClass implements Serializable{
 		category3.setName("일본 자동차 뉴스");
 		category3.setUrl("http://carview.yahoo.co.jp/news/");
 		category3.setRssUrl("http://headlines.yahoo.co.jp/rss/carv-bus.xml");
+		category3.setLocation("ko");
 		category3.setDate(new Date());
 		categorys.add( category3);
 
@@ -49,8 +52,21 @@ public class CategoryClass implements Serializable{
 		category4.setName("일본IT뉴스");
 		category4.setUrl("http://juggly.cn/");
 		category4.setRssUrl("http://feeds.feedburner.com/Jugglycn");
+		category4.setLocation("ko");
 		category4.setDate(new Date());
 		categorys.add( category4);
+
+
+		CategoryClass category5 = new CategoryClass();
+		category5.setStatus(1);
+		category5.setName("韓国芸能ニュース");
+		category5.setUrl("http://star.mt.co.kr");
+		category5.setRssUrl("http://rss.mt.co.kr/st_news.xml");
+		category5.setLocation("ja");
+		category5.setDate(new Date());
+		categorys.add( category5);
+
+
 
 		return categorys;
 	}
@@ -62,6 +78,8 @@ public class CategoryClass implements Serializable{
 	private String name;
 	private String url;
 	private String rssUrl;
+
+	private String location;
 
 	private Date date;
 	private int status;
@@ -125,6 +143,14 @@ public class CategoryClass implements Serializable{
 
 	public void setRssUrl(String rssUrl) {
 		this.rssUrl = rssUrl;
+	}
+
+	public String getLocation() {
+		return location;
+	}
+
+	public void setLocation(String location) {
+		this.location = location;
 	}
 
 }

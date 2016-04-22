@@ -22,4 +22,11 @@ public interface PostRespository extends JpaRepository<PostClass, Long> {
 	Page<PostClass> findByCategoryIdAndStatus(long categoryId, int status , Pageable paramPageable);
 
 	Page<PostClass> findByCategoryIdAndStatusAndDateBetween(long categoryId, int status ,Date departure, Date arrival, Pageable paramPageable);
+
+	List<PostClass> findByDateAfter(Date date);
+
+	List<PostClass> findByCategoryIdAndDateAfter(long categoryId, Date date);
+
+	Page<PostClass> findByDateAfter(Date date, Pageable paramPageable);
+
 }

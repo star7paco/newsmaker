@@ -9,9 +9,32 @@
  <div class="panel-body">
    [${category.name}] ${post.dateTime} <span class="badge">${post.clickCount}</span>
    <p>${post.stringBody}</p>
+   <br>
+   <a href="${post.url}">원문보기</a>
  </div>
 </div>
-<a href="${post.url}">원문보기</a>
+
+
+
+<div class="row">
+<c:forEach var="post" items="${hotpost}">
+  <div class="col-sm-6 col-md-4">
+    <div class="thumbnail">
+    ${post.imgTag}
+    <div class="caption">
+     <a href="/post/${post.id}">
+     ${post.stringTitle}
+     </a>
+    </div>
+    </div>
+  </div>
+</c:forEach>
+</div>
+
+
+
+
+
 <hr>
 
 <%
