@@ -8,6 +8,9 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
+
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -18,6 +21,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -60,8 +64,8 @@ public class NewsController {
 	TargetRespository targetRepo;
 
 	@RequestMapping("/")
-	String index(Model model) {
-		return postList(model , 0 , 0L, null);
+	String index(HttpServletResponse response ,Model model) {
+		return postList(response,model , 0 , 0L, null);
 	}
 
 	@RequestMapping("/admin")
@@ -164,13 +168,13 @@ public class NewsController {
 
 
 	@RequestMapping("post-list/{p}")
-	String postList(@PathVariable("p") Integer page, Model model) {
-		return postList(model,page,0L,"");
+	String postList(HttpServletResponse response ,@PathVariable("p") Integer page, Model model) {
+		return postList(response,model,page,0L,"");
 	}
 
 
 	@RequestMapping("post-list")
-	String postList(Model model, @RequestParam(required = false) Integer p,  @RequestParam(required = false) Long c, @RequestParam(required = false) String hit) {
+	String postList(HttpServletResponse response ,Model model, @RequestParam(required = false) Integer p,  @RequestParam(required = false) Long c, @RequestParam(required = false) String hit) {
 
 		if(p == null || p  < 0){
 			p = 0;
@@ -204,6 +208,7 @@ public class NewsController {
 			}
 		}
 
+		response.addCookie(new Cookie("post.page", String.valueOf(p)));
 
 		model.addAttribute("hotpost", getHotPostByCache());
 		model.addAttribute("postList", postList);
@@ -216,12 +221,10 @@ public class NewsController {
 	}
 
 	@RequestMapping("post/{Id}")
-	String post(@PathVariable("Id") Long postId, Model model , @RequestParam(required = false) String page) {
-		int intPage = 0;
-		try {
-			intPage = Integer.parseInt(page);
-		} catch (Exception e) {
-		}
+	String post(@PathVariable("Id") Long postId, Model model ,
+			@RequestParam(required = false) String page,
+			@CookieValue(value = "post.page", defaultValue = "0") Integer intPage) {
+
 
 		PostClass dsPost = getPost(postId);
 		PostClass post = new PostClass();
@@ -565,7 +568,9 @@ public class NewsController {
 
 		for (TargetClass target : targetList) {
 
-			targetRepo.delete( target.getId() );
+			TargetClass delete = new TargetClass();
+			BeanUtils.copyProperties(target, delete);
+			targetRepo.delete( delete );
 			 count ++;
 			if( start + RUN_TIME < System.currentTimeMillis()  ){
 				break;

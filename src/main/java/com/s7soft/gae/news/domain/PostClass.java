@@ -119,6 +119,57 @@ public class PostClass implements Serializable{
 		}
 	}
 
+	public String getListImgTag() {
+		if(imgurl != null && imgurl.trim().length() > 0){
+			String ret = "";
+			String urls[] = imgurl.split("@");
+
+			for(String url : urls){
+				if( url==null || url.isEmpty() ){
+					continue;
+				}
+				ret = ret + "<img class=\"media-object\" src=\""+url+"\">";
+			}
+			return ret;
+		}else{
+			return "<img class=\"media-object\" src=\"http://www.gpn.jp/econet/images/img_noimage.jpg\">";
+		}
+	}
+
+	public String getImgTag(String className) {
+		if(imgurl != null && imgurl.trim().length() > 0){
+			String ret = "";
+			String urls[] = imgurl.split("@");
+
+			for(String url : urls){
+				if( url==null || url.isEmpty() ){
+					continue;
+				}
+				ret = ret + "<img class=\""+className+"\" src=\""+url+"\">";
+			}
+			return ret;
+		}else{
+			return "";
+		}
+	}
+
+	public String getImgTagNoClass() {
+		if(imgurl != null && imgurl.trim().length() > 0){
+			String ret = "";
+			String urls[] = imgurl.split("@");
+
+			for(String url : urls){
+				if( url==null || url.isEmpty() ){
+					continue;
+				}
+				ret = ret + "<img src=\""+url+"\">";
+			}
+			return ret;
+		}else{
+			return "";
+		}
+	}
+
 
 	public String getVideoTag() {
 		if(videourl != null && videourl.trim().length() > 0){

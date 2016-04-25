@@ -21,9 +21,9 @@
 <div class="bs-example">
 <c:forEach var="post" items="${postList.content}">
 <div class="media">
-  <div class="media-top">
+  <div class="media-left col-xs-4">
    <a href="/post/${post.id}">
-     ${post.imgTag}
+     ${post.listImgTag}
    </a>
   </div>
   <div class="media-body">

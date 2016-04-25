@@ -19,13 +19,13 @@
 <div class="row">
 <c:forEach var="post" items="${hotpost}">
   <div class="col-sm-6 col-md-4">
-    <div class="thumbnail">
+    <div style="width: 120px; height: 90px; overflow: hidden">
     ${post.imgTag}
+    </div>
     <div class="caption">
      <a href="/post/${post.id}">
      ${post.stringTitle}
      </a>
-    </div>
     </div>
   </div>
 </c:forEach>
