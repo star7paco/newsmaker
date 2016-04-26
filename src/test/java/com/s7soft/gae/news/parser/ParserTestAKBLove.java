@@ -1,5 +1,7 @@
 package com.s7soft.gae.news.parser;
 
+import static org.assertj.core.api.Assertions.*;
+
 import java.util.List;
 
 import org.junit.Test;
@@ -53,12 +55,45 @@ public class ParserTestAKBLove {
 	}
 
 	@Test
-	public void testImg() {
-		String postUrl = "http://akb.48lover.com/log/29059";
+	public void testImg() throws Exception {
+		String postUrl = "http://akb.48lover.com/log/30012";
+		TargetClass target = new TargetClass();
+		target.setUrl(postUrl);
 
-		String imageLink = Parser.getImage(postUrl);
-		System.out.println(imageLink);
+		for(ParserClass parser: ParserClass.getDefault()){
+			if(!target.getUrl().contains(parser.getKey())){
+				continue;
+			}
 
+			TargetClass ret = Parser.parsing(target, parser);
+			System.out.println(ret.getUrl());
+			System.out.println(ret.getImgurl());
+			System.out.println(ret.getVideourl());
+			System.out.println(ret.getTitle());
+			System.out.println(ret.getStringBody());
+			assertThat(ret.getImgurl()).isNotEmpty().startsWith("http");
+		}
+	}
+
+	@Test
+	public void testvideo() throws Exception {
+		String postUrl = "http://akb.48lover.com/log/29105";
+		TargetClass target = new TargetClass();
+		target.setUrl(postUrl);
+
+		for(ParserClass parser: ParserClass.getDefault()){
+			if(!target.getUrl().contains(parser.getKey())){
+				continue;
+			}
+
+			TargetClass ret = Parser.parsing(target, parser);
+			System.out.println("url : "+ ret.getUrl());
+			System.out.println("img : " +ret.getImgurl());
+			System.out.println("video : " + ret.getVideourl());
+			System.out.println("title : "+ ret.getTitle());
+			System.out.println("body : " +ret.getStringBody());
+			assertThat(ret.getVideourl()).isNotEmpty().startsWith("http");
+		}
 	}
 
 

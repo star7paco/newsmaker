@@ -51,7 +51,7 @@ public class ParserClass implements Serializable{
 		parser3.startTitle = HtmlUtil.convertSanitize("<h1 class=\"title\">");
 		parser3.endTitle = HtmlUtil.convertSanitize("</h1>");
 		parser3.startBody = HtmlUtil.convertSanitize("<div class=\"post-body\">");
-		parser3.endBody = HtmlUtil.convertSanitize("</p>");
+		parser3.endBody = HtmlUtil.convertSanitize("<div class=\"item-box\">");
 		parser3.status = 1;
 		parser3.setDate(new Date());
 

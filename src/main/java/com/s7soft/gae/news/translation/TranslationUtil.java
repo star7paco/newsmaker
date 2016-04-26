@@ -95,14 +95,16 @@ public class TranslationUtil {
 		post.setOriginalKeywords(target.getKeywords());
 		post.setUrl(target.getUrl());
 		post.setDate(target.getDate());
+		post.setLang(target.getLang());
 
 		post.setClickCount(0);
 		post.setStatus(1);
 
 		Thread.sleep(100);
-
 		String title = getChangeHtml(target.getTitle());
+		Thread.sleep(100);
 		String body = transBody(target.getStringBody());
+		Thread.sleep(100);
 		String keywords = getChangeHtml(target.getKeywords());
 
 

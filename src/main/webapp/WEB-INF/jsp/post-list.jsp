@@ -7,10 +7,10 @@
 
  <c:choose>
    <c:when test="${category != null}">
-    <c:set var="pageUrl" value="/post-list?c=${category.id}&p=" />
+    <c:set var="pageUrl" value="/${cookie.lang.value}/post-list?c=${category.id}&p=" />
    </c:when>
    <c:otherwise>
-    <c:set var="pageUrl" value="/post-list?p=" />
+    <c:set var="pageUrl" value="/${cookie.lang.value}/post-list?p=" />
    </c:otherwise>
   </c:choose>
 
@@ -28,7 +28,7 @@
   </div>
   <div class="media-body">
    <a href="/post/${post.id}"><h4 class="media-heading">${post.stringTitle}</h4></a>
-   <a href="/post-list?c=${post.categoryId}">&lt;${post.categoryName}&gt;</a>${post.dateTime} <span class="badge">${post.clickCount}</span>
+   <a href="/${cookie.lang.value}/post-list?c=${post.categoryId}">&lt;${post.categoryName}&gt;</a>${post.dateTime} <span class="badge">${post.clickCount}</span>
   </div>
 </div>
 <hr>
@@ -43,7 +43,7 @@
    <c:otherwise>
     <li class="previous"><a href="${pageUrl}${page-1}"><span aria-hidden="true">&larr;</span>Newer</a></li></c:otherwise>
   </c:choose>
-  <li class="page-no"> ${page}</li>
+  <li class="page-no"> ${page} / ${postList.size} </li>
   <li class="next"><a href="${pageUrl}${page+1}">Older<span aria-hidden="true">&rarr;</span></a></li>
  </ul>
 </nav>

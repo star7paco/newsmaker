@@ -10,7 +10,9 @@
 <tr><td>targetCount</td><td>[${targetCount}]</td></tr>
 </table>
 
-<a class="btn btn-primary btn-lg" role="button" href="/post-list">post-list</a><br><br>
+<a class="btn btn-primary btn-lg col-xs-4" role="button" href="/ko/post-list">KO</a>
+<a class="btn btn-primary btn-lg col-xs-4" role="button" href="/ja/post-list">JA</a>
+<a class="btn btn-primary btn-lg col-xs-4" role="button" href="/en/post-list">EN</a>
 <br><br>
 <a class="btn btn-primary btn-lg" role="button" href="/admin/category-list">category-list</a><br>
 <a class="btn btn-primary btn-lg" role="button" href="/admin/target-list">target-list</a><br>

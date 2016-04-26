@@ -46,7 +46,7 @@ img{
 
 <%
 if (UserServiceFactory.getUserService().getCurrentUser() != null) { %>
-<li role="presentation"><b><%=UserServiceFactory.getUserService().getCurrentUser() .getNickname()%></b>님 환영합니다.</li>
+<li role="presentation"><b><%=UserServiceFactory.getUserService().getCurrentUser() .getNickname()%></b>님 환영합니다.(${cookie.lang.value})</li>
 <li role="presentation"><a href='<%=UserServiceFactory.getUserService().createLogoutURL("/")%>'>Logout</a></li>
 <%
 	if( AdminUtil.isAdminUser() ){
@@ -69,13 +69,13 @@ if (UserServiceFactory.getUserService().getCurrentUser() != null) { %>
    <c:if test="${ category != null }"><li class=""><a href="/post-list">모든 뉴스</a></li></c:if>
    <c:forEach var="menu" items="${ui.menus}">
    <c:if test="${ category == null }">
-    <li class=""><a href="/post-list?c=${menu.id}&p=">${menu.name}</a></li>
+    <li class=""><a href="/${cookie.lang.value}/post-list?c=${menu.id}&p=">${menu.name}</a></li>
    </c:if>
    <c:if test="${ category != null && category.id != menu.id }">
-    <li class=""><a href="/post-list?c=${menu.id}&p=">${menu.name}</a></li>
+    <li class=""><a href="/${cookie.lang.value}/post-list?c=${menu.id}&p=">${menu.name}</a></li>
    </c:if>
    <c:if test="${ category != null && category.id == menu.id }">
-    <li class="active"><a href="/post-list?c=${menu.id}&p=">${menu.name}</a></li>
+    <li class="active"><a href="/${cookie.lang.value}/post-list?c=${menu.id}&p=">${menu.name}</a></li>
    </c:if>
    </c:forEach>
   </ul>

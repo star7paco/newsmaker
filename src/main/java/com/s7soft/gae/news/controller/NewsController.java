@@ -9,6 +9,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.BeanUtils;
@@ -25,6 +26,8 @@ import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.google.appengine.api.memcache.ErrorHandlers;
 import com.google.appengine.api.memcache.MemcacheService;
@@ -43,6 +46,7 @@ import com.s7soft.gae.news.rss.RssReader;
 import com.s7soft.gae.news.translation.TranslationUtil;
 import com.s7soft.gae.news.ui.UI;
 import com.s7soft.gae.news.util.HtmlUtil;
+import com.s7soft.gae.news.util.LocaleUtil;
 import com.s7soft.gae.news.util.TimeUtil;
 
 @Controller
@@ -65,7 +69,8 @@ public class NewsController {
 
 	@RequestMapping("/")
 	String index(HttpServletResponse response ,Model model) {
-		return postList(response,model , 0 , 0L, null);
+		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+		return postList( LocaleUtil.getLoction(request) , response, model , 0 , 0L);
 	}
 
 	@RequestMapping("/admin")
@@ -166,16 +171,24 @@ public class NewsController {
 		return "redirect:/admin/parser-list";
 	}
 
-
-	@RequestMapping("post-list/{p}")
+	@RequestMapping("/post-list")
+	String postList(HttpServletResponse response ,Model model) {
+		return postList("ko",response,model,0,0L);
+	}
+	@RequestMapping("/post-list/{p}")
 	String postList(HttpServletResponse response ,@PathVariable("p") Integer page, Model model) {
-		return postList(response,model,page,0L,"");
+		return postList("ko",response,model,page,0L);
+	}
+
+	@RequestMapping("{lang}/post-list/{p}")
+	String postList(@PathVariable("lang") String lang, HttpServletResponse response ,@PathVariable("p") Integer page, Model model) {
+		return postList(lang,response,model,page,0L);
 	}
 
 
-	@RequestMapping("post-list")
-	String postList(HttpServletResponse response ,Model model, @RequestParam(required = false) Integer p,  @RequestParam(required = false) Long c, @RequestParam(required = false) String hit) {
-
+	@RequestMapping("{lang}/post-list")
+	String postList(@PathVariable("lang") String lang, HttpServletResponse response ,Model model, @RequestParam(required = false) Integer p,  @RequestParam(required = false) Long c) {
+		log.info("Start post-list : " + lang);
 		if(p == null || p  < 0){
 			p = 0;
 		}
@@ -188,9 +201,9 @@ public class NewsController {
 		CategoryClass category =  getCategory(c);
 		String keywords = "일본,뉴스";
 
-		Pageable pageable = new PageRequest(p, 12 , Direction.DESC , "date");
+		Pageable pageable = new PageRequest(p, 20 , Direction.DESC , "date");
 		if(category == null){
-			postList = postRepo.findByStatus(1, pageable);
+			postList = postRepo.findByLangAndStatus(lang, 1, pageable);
 
 		}else{
 			postList = postRepo.findByCategoryIdAndStatus(c, 1, pageable);
@@ -206,9 +219,16 @@ public class NewsController {
 				saveObj.setCategoryName(postCategory.getName());
 				postRepo.save(saveObj);
 			}
+			if(StringUtils.isEmpty(post.getLang())){
+				PostClass saveObj = new PostClass();
+				BeanUtils.copyProperties(post, saveObj);
+				saveObj.setLang("ko");
+				postRepo.save(saveObj);
+			}
 		}
 
 		response.addCookie(new Cookie("post.page", String.valueOf(p)));
+		response.addCookie(new Cookie("lang", lang));
 
 		model.addAttribute("hotpost", getHotPostByCache());
 		model.addAttribute("postList", postList);
@@ -258,6 +278,12 @@ public class NewsController {
 				System.out.println("Update post Category Name");
 				CategoryClass postCategory = getCategory(post.getCategoryId());
 				post.setCategoryName(postCategory.getName());
+			}
+
+			// data 後修正 カテゴリ名追加
+			if(StringUtils.isEmpty(post.getLang())){
+				System.out.println("Update post Category Name");
+				post.setLang("ko");
 			}
 
 			if(!AdminUtil.isAdminUser()){
@@ -384,12 +410,14 @@ public class NewsController {
 					continue;
 				}
 				target.setCategoryId(category.getId());
+				target.setLang(category.getLocation());
 				target.setStatus(1);
 				target.setDate(new Date());
 				targetRepo.save(target);
 			}
 		}
 		log.info("END RssRead");
+//		updateByPostLang();
 		return "index";
 	}
 
@@ -759,4 +787,23 @@ public class NewsController {
 		return ret;
 
 	}
+
+//	private void updateByPostLang() {
+//		log.info("start updateByPostLang");
+//		Pageable pageable = new PageRequest(0, 30);
+//		Page<PostClass> postList = postRepo.findByLangNot("ko", pageable);
+//
+//		log.info("not lang ko is : " + postList.getNumberOfElements());
+//
+//		for (PostClass post : postList.getContent()) {
+//
+//			if(StringUtils.isEmpty(post.getLang())){
+//				PostClass saveObj = new PostClass();
+//				BeanUtils.copyProperties(post, saveObj);
+//				saveObj.setLang("ko");
+//				postRepo.save(saveObj);
+//			}
+//		}
+//		log.info("start updateByPostLang");
+//	}
 }

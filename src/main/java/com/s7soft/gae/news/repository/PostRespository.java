@@ -13,7 +13,10 @@ import com.s7soft.gae.news.domain.PostClass;
 public interface PostRespository extends JpaRepository<PostClass, Long> {
 	List<PostClass> findByTitle(String title);
 
-	Page<PostClass> findByStatus(int status , Pageable paramPageable);
+	Page<PostClass> findByLangAndStatus(String lang , int status , Pageable paramPageable);
+
+//	Page<PostClass> findByLangNot(String lang , Pageable paramPageable);
+	//Page<PostClass> findByStatus(int status , Pageable paramPageable);
 
 	Page<PostClass> findByStatusAndDateBetween(int status ,Date departure, Date arrival, Pageable paramPageable);
 

@@ -161,6 +161,11 @@ public class Parser {
 				}
 			}
 
+			// yahoo専用img探し
+			if(  target.getUrl().contains("yahoo.co.jp")  ){
+				getYahooMedia(target, doc.getAllElements().html());
+			}
+
 			title = title.replaceAll("<.+?>", "");
 			body = body.replaceAll("<.+?>", "");
 
@@ -225,19 +230,43 @@ public class Parser {
 		return txt.substring(start, end).replaceAll("<.+?>", "");
 	}
 
-	public static String getHtml(String txt ,String startKey, String endKey) {
+	public static String getHtml(String body ,String startKey, String endKey) {
 
-		if(txt == null || txt.isEmpty() ){
+		if(body == null || body.isEmpty() ){
 			return "";
 		}
 
 		startKey = HtmlUtil.convertUnsanitize(startKey);
 		endKey = HtmlUtil.convertUnsanitize(endKey);
 
-		int start = txt.indexOf(startKey) + startKey.length();
-		int end = start + txt.substring(start).indexOf(endKey);
+		int start = body.indexOf(startKey) + startKey.length();
+		int end = start + body.substring(start).indexOf(endKey);
 
-		return txt.substring(start, end);
+		return body.substring(start, end);
+	}
+
+
+	public static void getYahooMedia(TargetClass target, String body ){
+		String startKey = "<div class=\"thumb\">" ;
+		String endKey = "</div>";
+
+		int start = body.indexOf(startKey) + startKey.length();
+		int end = start + body.substring(start).indexOf(endKey);
+
+		// 画像のlinkを取得 + 動画の場合は動画を追加する。
+		Pattern imgP = Pattern.compile("<\\s*img.*src\\s*=\\s*([\\\"'])?([^ \\\"']*)[^>]*>");
+		Matcher imgM = imgP.matcher(body.substring(start, end));
+		if (imgM.find()) {
+			String src = imgM.group(2);//ここにURLが入る
+			if( src.contains("//www.youtube") ){
+				System.out.println(src);
+				target.addVideourl(src);
+			}else{
+				if(!src.contains("get_flash_player")){
+					target.addImgurl(src);
+				}
+			}
+		}
 	}
 
 	public static void getMedia(TargetClass target ,String html){

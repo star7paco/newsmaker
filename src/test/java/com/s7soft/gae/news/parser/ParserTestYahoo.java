@@ -105,7 +105,9 @@ public class ParserTestYahoo {
 			}
 			try {
 				TargetClass ret = Parser.parsing(target, parser);
-				System.out.println(ret.getImgurl());
+
+				assertThat(ret.getImgurl()).isNotEmpty().startsWith("http").endsWith("jpg");
+
 			} catch (Exception e) {
 				// TODO 自動生成された catch ブロック
 				e.printStackTrace();

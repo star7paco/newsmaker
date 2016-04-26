@@ -58,7 +58,7 @@ if( AdminUtil.isAdminUser() ){
 <%= AdSense.PostEnd %>
 <nav>
   <ul class="pager">
-    <li><a href="/post-list?p=${page}">back</a></li>
+    <li><a href="/${cookie.lang.value}/post-list?p=${page}">back</a></li>
   </ul>
 </nav>
 </div>

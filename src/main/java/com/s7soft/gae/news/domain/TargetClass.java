@@ -33,6 +33,8 @@ public class TargetClass implements Serializable{
 	private String videourl;
 	private Text body;
 
+	private String lang;
+
 	private Date date;
 	private int status;
 
@@ -154,6 +156,14 @@ public class TargetClass implements Serializable{
 
 	public void setKeywords(String keywords) {
 		this.keywords = keywords;
+	}
+
+	public String getLang() {
+		return lang;
+	}
+
+	public void setLang(String lang) {
+		this.lang = lang;
 	}
 
 

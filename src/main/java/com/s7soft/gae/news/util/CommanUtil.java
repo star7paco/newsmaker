@@ -13,20 +13,6 @@ public class CommanUtil {
         return false;
 	}
 
-	public static String getLoction(HttpServletRequest request){
-
-		//① ブラウザの言語設定が取得できた場合
-		if (request.getLocales() != null) {
-		    // とある処理を実行
-		    // ・・・・
-
-		//② ブラウザの言語設定が取得できない（未設定）の場合
-		} else {
-		    // とある処理を実行
-		    // ・・・・
-		}
-		return "ko";
-	}
 
 
 }

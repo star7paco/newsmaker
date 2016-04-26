@@ -29,7 +29,6 @@ public class PostClass implements Serializable{
 	private Text body;
 	private String keywords;
 	private String originalKeywords;
-
 	private String originalTitle;
 	private Text originalBody;
 	private String imgurl;
@@ -38,6 +37,7 @@ public class PostClass implements Serializable{
 	private int status;
 	private int clickCount;
 
+	private String lang;
 
 	public String getDateTime() {
 		return TimeUtil.format(date);
@@ -119,21 +119,23 @@ public class PostClass implements Serializable{
 		}
 	}
 
+	/**
+	 * post-listに表示する
+	 * */
 	public String getListImgTag() {
 		if(imgurl != null && imgurl.trim().length() > 0){
-			String ret = "";
 			String urls[] = imgurl.split("@");
 
 			for(String url : urls){
 				if( url==null || url.isEmpty() ){
 					continue;
 				}
-				ret = ret + "<img class=\"media-object\" src=\""+url+"\">";
+				// Imageを１個だけ使用する
+				return "<img class=\"media-object\" src=\""+url+"\">";
 			}
-			return ret;
-		}else{
-			return "<img class=\"media-object\" src=\"http://www.gpn.jp/econet/images/img_noimage.jpg\">";
+//			return ret;
 		}
+		return "<img class=\"media-object\" src=\"http://www.gpn.jp/econet/images/img_noimage.jpg\">";
 	}
 
 	public String getImgTag(String className) {
@@ -292,6 +294,14 @@ public class PostClass implements Serializable{
 
 	public void setCategoryName(String categoryName) {
 		this.categoryName = categoryName;
+	}
+
+	public String getLang() {
+		return lang;
+	}
+
+	public void setLang(String lang) {
+		this.lang = lang;
 	}
 
 
