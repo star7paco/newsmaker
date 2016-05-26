@@ -11,17 +11,17 @@ public class LocaleUtil {
 		Locale locale = request.getLocale();
 
 		//① ブラウザの言語設定が取得できた場合
-		if (locale != null) {
-		    // とある処理を実行
-		    // ・・・・
-			if(isKorean(locale)){
-				return "ko";
-			}else if(isJapanese(locale)){
-				return "ja";
-			}else if(isEnglish(locale)){
-				return "en";
-			}
-		}
+//		if (locale != null) {
+//		    // とある処理を実行
+//		    // ・・・・
+//			if(isKorean(locale)){
+//				return "ko";
+//			}else if(isJapanese(locale)){
+//				return "ja";
+//			}else if(isEnglish(locale)){
+//				return "en";
+//			}
+//		}
 
 		//② ブラウザの言語設定が取得できない（未設定）の場合
 		return "ko";
