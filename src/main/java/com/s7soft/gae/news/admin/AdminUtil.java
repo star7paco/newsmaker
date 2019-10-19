@@ -5,7 +5,7 @@ import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
 
 public class AdminUtil {
-	public static final String ADMIN_ID = "goccxg@gmail.com";
+	public static final String ADMIN_ID = "xxxxxx@gmail.com";
 
 
 	public static boolean isAdminUser(){
