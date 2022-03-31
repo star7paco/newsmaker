@@ -65,7 +65,7 @@
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-webmvc</artifactId>
-			<version>4.1.3.RELEASE</version>
+			<version>5.3.18</version>
 		</dependency>
 
 		<!-- 여기가 세번째 db추가였던가.  -->
